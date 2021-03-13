@@ -1,0 +1,36 @@
+body{
+    /*background-color: #42413C;*/
+}
+
+.footer{
+    position: fixed;
+    bottom: 0px;
+    border-top-style: solid;
+    width: 100%;
+    padding-left: 2%;
+    background-color: white;
+}
+/*.footer {
+    padding: 10px 0;
+    background-color: #F2F2F2;
+    position: relative;
+     isso possibilita que o hasLayout do IE6 faça a limpeza corretamente. 
+    clear: both; 
+     essa propriedade de limpeza força o contêiner a reconhecer o conteúdo das colunas e onde elas terminam. 
+}*/
+
+#buttonMini{
+    position: absolute;
+    right: 15px;
+    font-size: 10px;
+}
+h1{
+    font-size: 20px;
+}
+
+h3{
+    font-size: 18px;
+}
+h2{
+    font-size: 15px;
+}

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<script>
+		if (!localStorage.usuario) window.location.assign('../index.html');
+	</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title class="titulo_projeto_title">Carregando...</title>
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="stylesheet" href="../biblioteca/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/datatables.net/datatables.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="../biblioteca/dist/css/skins/_all-skins.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+	<link rel="stylesheet" href="../biblioteca/bower_components/toast/jquery.toast.min.css">
+	<script>
+		var isApp_Global = true;
+	</script>
+</head>
+
+<body class="hold-transition fixed sidebar-mini" id="corpoPrincipalBody">
+
+<div class="wrapper" id="corpoPrincipal">
+	<header class="main-header">
+		<a href="#" class="logo">
+			<span class="logo-mini titulo_projeto_mini"></span>
+			<span class="logo-lg titulo_projeto"></span>
+		</a>
+		<nav class="navbar navbar-static-top">
+
+			<div style="margin-left: 15px; margin-top: 15px;display: inline-block;white-space: nowrap;">
+				Olá: <span class="nome_usuario" style="color: blue;">Usuário</span>
+			</div>
+
+			<div class="navbar-custom-menu">
+				<ul class="nav navbar-nav" style="color: white;">
+					<li class="btn-primary" onclick="this.blur();">
+						<a href="#"
+							onclick="abrirConteudo($(document.createElement('span')).attr('data-file','main'),'Principal');"
+						>
+							<b>Menu</b>
+						</a>
+					</li>
+					<li class="dropdown user user-menu" style="background-color: #f0ad4e;">
+						<a href="#" class="btn-logoff">
+							<b>Sair</b>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+		</nav>
+	</header>
+
+	<!-- =============================================== -->
+
+	<aside class="main-sidebar">
+		<section class="sidebar">
+			<div class="user-panel">
+				<div class="pull-left image">
+					<img src="../img/user.png" class="img-circle" alt="User Image">
+				</div>
+				<div class="pull-left info">
+					<p class="nome_usuario">Usuário</p>
+				</div>
+			</div>
+			<ul class="sidebar-menu" data-widget="tree"></ul>
+		</section>
+	</aside>
+
+	<div class="content-wrapper">
+		<section class="content-header" style="padding: 0;">
+			<h1 style="display: none;">
+				<span class="titulo_pagina">Carregando...</span>
+			</h1>
+			<ol class="breadcrumb" style="display: none;"></ol><!-- Caminho para chegar na pagina -->
+		</section>
+
+		<section class="content" style="padding: 0;">
+			<div class="box" id="conteudo_pagina"></div>
+		</section>
+	</div>
+
+	<footer class="main-footer" style="position: fixed;bottom:0;width:100%;">
+		<div class="pull-right hidden-xs">
+			<b>Versão</b> <span id="verionFoot"></span>
+		</div>
+		<strong>Criado por <spam id="developerFoot"></spam>.</strong> Todos os direitos reservados.
+	</footer>
+
+	<div class="control-sidebar-bg"></div>
+</div>
+
+<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../biblioteca/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../biblioteca/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="../biblioteca/bower_components/fastclick/lib/fastclick.js"></script>
+<script src="../biblioteca/bower_components/datatables.net/datatables.min.js"></script>
+<script src="../biblioteca/bower_components/select2/dist/js/select2.full.min.js"></script>
+<script src="../biblioteca/bower_components/moment/moment.js"></script>
+<script src="../biblioteca/dist/js/adminlte.min.js"></script>
+<script src="../biblioteca/dist/js/demo.js"></script>
+<script src="../biblioteca/bower_components/platform/platform.js"></script>
+<script src="../biblioteca/bower_components/toast/jquery.toast.min.js"></script>
+<script src="../biblioteca/bower_components/amcharts/core.js"></script>
+<script src="../biblioteca/bower_components/amcharts/charts.js"></script>
+<script src="../biblioteca/bower_components/amcharts/animated.js"></script>
+<script src="../biblioteca/bower_components/amcharts/pt_BR.js"></script>
+<script src="../biblioteca/bower_components/jquery-browser-detection/jquery.browser.detection.min.js"></script>
+<script src="../biblioteca/bower_components/jquery-mask/jquery.mask.min.js"></script>
+
+<div id="styleAdicional" style="display: none;"></div>
+
+<script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
+
+<script>
+
+if (!localStorage.IP || !localStorage.PATH) window.location.assign('../index.html');
+var caminhoRequisicao = "http://" + localStorage.getItem("IP") + "/" + localStorage.getItem("PATH") + "/";
+var usuario_Global = JSON.parse(localStorage.getItem('usuario'));
+
+$(document).ready(function() { updateLibs(); });
+
+function updateLibs() { 
+	importLib(caminhoRequisicao + "js/indexApp.js", 'indexApp');
+	importLib(caminhoRequisicao + "script.js", 'script');
+	preInit();
+}
+
+function preInit() { 
+	if ( 
+		window['objParamGrade_Global'] != undefined && 
+		window['ajax'] != undefined && 
+		window['app'] != undefined
+	) { 
+		$("#styleAdicional").html(""
+		// + 	"<script type=\"text/javascript\" src=\"cordova.js\"></"+"script>"
+			+ 	"<style>"
+			+ 		"tr:hover > .celB{background-color: "+objParamGrade_Global.hoverTrTableColor+" !important;}"
+			+ 	"</style>"
+		);
+		app.initialize();
+		initComponet();
+	} else { 
+		setTimeout(() => { preInit(); }, 10);
+	}
+}
+
+function importLib(path, key) { 
+	var ext = (path.split('.')).pop();
+	if (['js','css'].indexOf(ext.toLowerCase()) < 0) return false;
+
+	getCtx(path, key, function(ctx, path) { 
+		var ext = (path.split('.')).pop();
+		$('body').append(
+			ext.toLowerCase() == 'js'
+			? `<script>${ctx}</`+`script>`
+			: `<style>${ctx}</style>`
+		);
+	});
+}
+
+function getCtx(path, key, callback) { 
+	var param = (typeof path == 'object' ? path : { 
+		'dataFile': true,
+		'path': path.replace(caminhoRequisicao, '../')
+	});
+
+	$.ajax({
+		  url: 		caminhoRequisicao + 'controller/controller.php'
+		, type: 	'POST'
+		, dataType: 'text'
+		, data: 	$.extend({}, usuario_Global, param)
+		, error: function() { offlineFile(path, key, callback); }
+		, timeout: 1000
+	}).done(function(data) { 
+		if (typeof path == 'object') { 
+			localStorage.setItem(key, data);
+			offlineFile(path, key, callback);
+		} else { 
+			var func = localStorage[key] && localStorage.getItem('dt_' + key) == data ? 'offline' : 'download';
+			window[func+'File'](path, key, callback, data);
+		}
+	});
+}
+
+function downloadFile(path, key, callback, dataArquivo) { 
+	$.ajax({
+		url: path,
+		error: function() { offlineFile(path, key, callback); }
+	}).done(function(data) { 
+		if (key != 'script') data = data.replace(//g, '');
+		data = data.replace(/<\/script>/gi, "</\"+\"script>");
+
+		localStorage.setItem('dt_' + key, dataArquivo);
+		localStorage.setItem(key, data);
+		callback(data, path);
+	});
+}
+
+function offlineFile(path, key, callback) { 
+	if (localStorage[key]) { 
+		callback(localStorage.getItem(key), path);
+	} else { 
+		console.log('Sem conexão!', key);
+		alert('Sem conexão!', { icon: 'warning' });
+	}
+}
+
+</script>
+</body>
+<div id="telaLinhaCentral" style="display: none;"></div>
+<div id="rodapeBtnCamera" style="display: none;">
+	<table width="25%" style="background-color: transparent;">
+		<tr style="background-color: transparent;">
+			<td style="display: none">
+				<button id="prepare">QR Scanner</button>
+			</td>
+			<td style="display: none" align='center'>
+				<button id="show">QR Show</button>
+			</td>
+			<td style="display: none" align='center'>
+				<button id="hide">QR Hide</button>
+			</td>
+			<td style="display: none" align='center'>
+				<button id="scan">QR Scan</button>
+			</td>
+			<td id="btnLightCamera" style="display: none;background-color: transparent;">
+				<img src="../img/flashbuttonoff.png" width="50px" id="imgCameraLight">
+			</td>
+		</tr>
+	</table>
+</div>
+
+<style>
+	#rodapeBtnCamera { 
+		position: 			fixed;
+		top: 				0px;
+		width: 				100%;
+		padding: 			10px;
+		background-color: 	transparent;
+	}
+	#telaLinhaCentral { 
+		width: 96%;
+		left: 2%;
+		background: red;
+		color: white;
+		padding: 2px;
+		border-radius: 10px;
+		position: absolute;
+		top: 50%;
+		bottom: 50%;
+		animation: pisca_pisca 1s infinite;
+		transform: translate(0%, -50%) 
+	}
+	#linha { 
+		width: 100%;
+		margin-top: 50%;
+		border: 5px solid red;
+	}
+	@keyframes pisca_pisca { 
+		0% 		{ opacity: 0.3;	}
+		50% 	{ opacity: 1;	}
+		100% 	{ opacity: 0.3;	}
+	}
+</style>
+
+</html>

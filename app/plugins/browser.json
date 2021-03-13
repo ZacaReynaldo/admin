@@ -1,0 +1,27 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "org.myapp.sample"
+    },
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "com.jackBiller.helloword"
+    },
+    "cordova-plugin-qrscanner": {
+      "PACKAGE_NAME": "com.jackBiller.helloword"
+    },
+    "cordova-plugin-printer": {
+      "PACKAGE_NAME": "com.jackBiller.helloword"
+    },
+    "phonegap-plugin-push": {
+      "PACKAGE_NAME": "br.com.jackBiller.sanhidrelApp"
+    }
+  },
+  "dependent_plugins": {}
+}

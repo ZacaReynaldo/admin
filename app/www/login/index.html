@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title class="titulo_projeto">Carregando...</title>
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="stylesheet" href="../biblioteca/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="../biblioteca/plugins/iCheck/square/blue.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+	<script>
+		// var ext = (window.location.href.split('.')[1] || '').split('?')[0].split('#')[0];
+		// if ((['html','php','htm']).indexOf(ext) != -1) { 
+		// 	var url = window.location.href.split('/');
+		// 	window.location.assign(url.splice(0,url.length-1).join('/'));
+		// }
+	</script>
+</head>
+<body class="hold-transition login-page" 
+	style="
+		background-size: 100% 100%;"
+>
+<!-- 
+	"background-color": "#FFABAC",
+	"background-color2": "#FF898A" 
+-->
+	<div class="login-box">
+		<div class="login-logo">
+			<img class="logo_png" src="../img/logotipo.png" onclick="configurarIP();" alt="" width="100%">
+			<a href="#" class="titulo_projeto_login"></a>
+		</div>
+		<div class="login-box-body">
+			<form id='formLogin' action="controller/login.php" method="post">
+				<span id="login_desc">Usuário</span>:
+				<div class="form-group has-feedback">
+					<input type="text" class="form-control" id="login" name="login" required autofocus>
+				</div>
+				<!-- Login:
+				<div class="form-group has-feedback">
+					<input type="text" class="form-control" id="login" name="login">
+				</div> -->
+				Senha:
+				<div class="form-group has-feedback">
+					<input type="password" class="form-control" id="senha" name="senha">
+				</div>
+				<div class="row">
+					<div class="col-xs-8" id="statusConexao">
+						<i class="fa fa-circle" style="color: gray;"></i> Carregando...
+					</div>
+					<div class="col-xs-4">
+						<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+
+<!-- Modal para Configurar Ip -->
+<div class="modal fade" id="modalConfigIp" role="dialog">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" id="fecharModalIpBottun" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Configurar IP: </h4>
+			</div>
+			<div class="modal-body">
+				<div id="autentica">
+
+					Login:
+					<input type="text" class="form-control" id="loginIP">
+
+					<br>
+					Senha:
+					<input type="password" class="form-control" id="senhaIP">
+
+					<br>
+					<button class="btn btn-primary" onclick="logarIP()">
+						Configurar
+					</button>
+
+				</div>
+				<div id="ipChange" class="hidden">
+					IP:
+					<input type="text" class="form-control" id="ipModal">
+
+					<br>
+					Path:
+					<input type="text" class="form-control" id="pathModal">
+
+					<br>
+					<button class="btn btn-success" onclick="definirIP()">
+						Definir
+					</button>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					Fechar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+
+<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../biblioteca/plugins/iCheck/icheck.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
+<script>
+var app = { 
+	initialize: function() { 
+		document.addEventListener('deviceready', this.onDeviceReady, false);
+	},
+	onDeviceReady: function() { 
+		document.addEventListener("backbutton", function(e) { 
+			e.preventDefault(), onBackKeyDown();
+		}, false); 
+	},
+};
+
+function onBackKeyDown() { 
+	if (confirm('Deseja sair do App?')) navigator.app.exitApp();
+}
+
+app.initialize();
+
+$(function() { 
+	$('input').iCheck({
+		checkboxClass: 'icheckbox_square-blue',
+		radioClass: 'iradio_square-blue',
+		increaseArea: '20%' /* optional */
+	});
+});
+
+var caminhoRequisicao = "";
+var ips_Global, path_Global;
+$.getJSON("../config.json", function(data) { 
+	console.log(data);
+	if ((data.login.no_set_nome || '') == '') { 
+		$(".titulo_projeto_login").html((data.nome_projeto || ''));
+	}
+	$(".titulo_projeto").html((data.nome_projeto || ''));
+
+	if (((data.login || {})["logo_png"] || '') != '')
+		$(".logo_png").attr('src', '../img/' + data.login.logo_png + '.png');
+	else if ((data.logo_png || '') != '')
+		$(".logo_png").attr('src', '../img/' + data.logo_png + '.png');
+	else 
+		$(".logo_png").css('display','none');
+
+	if (((data.login || {})["background-color"] || '') != '')
+		$("body").css("background-color", data.login["background-color"])
+
+	if (((data.login || {})["background-color2"] || '') != '')
+		$(".login-box-body").css("background-color", data.login["background-color2"])
+
+	if ((data.login || '') != '') { 
+		$("#login").attr('type', (data.login.login_type || 'text'));
+		if ((data.login.login_maxlength || '') != '') $("#login").attr('maxlength', data.login.login_maxlength);
+		$("#login_desc").html((data.login.login_desc || 'Login'));
+	}
+
+	if (!localStorage.IP || !localStorage.PATH) { 
+		console.log(data.ip.split('|'));
+		ips_Global = data.ip.split('|');
+		path_Global = data.path.split('|');
+		testarConexao();
+	} else { 
+		caminhoRequisicao = "http://" + localStorage.getItem("IP") + "/" + localStorage.getItem("PATH") + "/";
+		setIpModal();
+		testarConaxao();
+	}
+
+	// if (!localStorage.IP) localStorage.setItem("IP", data.ip);
+	// caminhoRequisicao = "http://" + localStorage.getItem("IP") + "/PHP/metier/";
+	// testarConexao({ ips: data.ip.split('|'), path: data.path.split('|') });
+});
+
+$("#formLogin").submit(function(e) { 
+	e.preventDefault();
+	$.ajax({
+		url: caminhoRequisicao + 'controller/login.php'
+		, type: 'POST'
+		, dataType: 'text'
+		, data: { 
+				'login': $("#login").val()
+			, 'senha': $("#senha").val()
+		}
+		, error: function() { 
+			alert('Falha ao fazer a requisição!');
+		}
+	}).done(function(data) { 
+		console.log(data);
+		data = JSON.parse(data);
+		console.log(data);
+
+		if (data[0].debug == 'OK') { 
+			localStorage.setItem('usuario',JSON.stringify(data[0]));
+			window.location.assign('../principal/index.html');
+		} else { 
+			alert('Login inválido!');
+			$("#login").val('')[0].focus();
+			$("#senha").val('');
+		}
+	});
+});
+
+function configurarIP() { 
+	$("#modalConfigIp").modal('show');
+}
+
+function logarIP() { 
+	var loginIP = $("#loginIP").val();
+	var senhaIP = $("#senhaIP").val();
+
+	if (loginIP.toUpperCase() == "ADM" && senhaIP == "2018") { 
+		$("#autentica")[0].className = "hidden";
+		$("#ipChange")[0].className = "";
+		$("#loginIP").val("");
+		$("#senhaIP").val("");
+		$("#ipModal").focus();
+	}
+	else alert("Login inválido!");
+}
+
+function definirIP() { 
+	var ip = $("#ipModal").val();
+	var path = $("#pathModal").val();
+	localStorage.setItem("IP", ip);
+	localStorage.setItem("PATH", path);
+	caminhoRequisicao = "http://" + ip + "/" + path + "/";
+	testarConaxao({boolAlert: true, modalConfig: true});
+}
+
+function testarConexao(indiceIp=0, indicePath=0) { 
+	var final = ips_Global.length == indiceIp && path_Global.length == indicePath;
+
+	var nextIndexIp = indiceIp, nextIndexPath = indicePath + 1;
+	if (path_Global.length == indicePath -1) { 
+		nextIndexIp = indiceIp + 1;
+		nextIndexPath = 0;
+	}
+
+	$.ajax({
+		url: "http://" + ips_Global[indiceIp] + '/' + path_Global[indicePath] + "/controller/ping.php",
+		type: 'GET',
+		dataType: 'text',
+		timeout: 500,
+		error: function() { 
+			if (final) { 
+				$("#statusConexao").html("<i class='fa fa-circle' style='color: red'></i> Offline");
+			} else { 
+				testarConexao(nextIndexIp, nextIndexPath);
+			}
+		}
+	}).done(function(data) { 
+		if (data == '1' || data == 1) { 
+			localStorage.setItem("IP", ips_Global[indiceIp]);
+			localStorage.setItem("PATH", path_Global[indicePath]);
+			caminhoRequisicao = "http://" + ips_Global[indiceIp] + "/" + path_Global[indicePath] + "/";
+			$("#statusConexao").html("<i class='fa fa-circle' style='color: green'></i> Online");
+			setIpModal();
+		} else if(final) { 
+			$("#statusConexao").html("<i class='fa fa-circle' style='color: red'></i> Offline");
+		} else { 
+			testarConexao(nextIndexIp, nextIndexPath);
+		}
+	});
+}
+
+function setIpModal() { 
+	document.getElementById("ipModal").value = localStorage.getItem("IP");
+	document.getElementById("pathModal").value = localStorage.getItem("PATH");
+}
+
+function testarConaxao(option={}) { 
+	option = $.extend({}, {modalConfig: false, boolAlert: false}, option);
+	$.ajax({
+		url: caminhoRequisicao + "/controller/ping.php",
+		type: 'GET',
+		dataType: 'text',
+		timeout: 500,
+		error: function(){
+			$("#statusConexao").html("<i class='fa fa-circle' style='color: red'></i> Offline");
+			if (option.boolAlert) alert("Sem conexão");
+		}
+	}).done( function(data){
+		if (data == '1' || data == 1) { 
+			$("#statusConexao").html("<i class='fa fa-circle' style='color: green'></i> Online");
+			if (option.modalConfig) $("#modalConfigIp").modal('hide');
+		} else { 
+			$("#statusConexao").html("<i class='fa fa-circle' style='color: red'></i> Offline");
+			if(option.boolAlert) alert("Sem conexão");
+		}
+	});
+}
+
+</script>
+</html>

@@ -1,0 +1,38 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "org.myapp.sample"
+    },
+    "cordova-plugin-camera": {
+      "ANDROID_SUPPORT_V4_VERSION": "27.+",
+      "PACKAGE_NAME": "com.jackBiller.helloword"
+    },
+    "cordova-plugin-qrscanner": {
+      "PACKAGE_NAME": "com.jackBiller.helloword"
+    },
+    "cordova-plugin-printer": {
+      "ANDROID_SUPPORT_V4_VERSION": "28.+",
+      "PACKAGE_NAME": "com.jackBiller.helloword"
+    },
+    "phonegap-plugin-push": {
+      "ANDROID_SUPPORT_V13_VERSION": "27.+",
+      "FCM_VERSION": "17.0.+",
+      "PACKAGE_NAME": "br.com.jackBiller.sanhidrelApp"
+    }
+  },
+  "dependent_plugins": {
+    "cordova-support-google-services": {
+      "PACKAGE_NAME": "br.com.jackBiller.sanhidrelApp"
+    },
+    "phonegap-plugin-multidex": {
+      "PACKAGE_NAME": "br.com.jackBiller.sanhidrelApp"
+    }
+  }
+}

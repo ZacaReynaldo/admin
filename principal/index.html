@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<script>
+		if (!localStorage.usuario) window.location.assign('../index.html');
+	</script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title class="titulo_projeto_title">Carregando...</title>
+	<link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon">
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<!-- START_LIB_HEAD -->
+	<link rel="stylesheet" href="../biblioteca/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/datatables.net/datatables.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/photoswipe/photoswipe.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/photoswipe/default-skin/default-skin.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/toast/jquery.toast.min.css">
+	<!-- END_LIB_HEAD -->
+	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="../biblioteca/dist/css/skins/_all-skins.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+	<script>
+		var ext = (window.location.href.split('.')[1] || '').split('?')[0].split('#')[0];
+		if ((['html','php','htm']).indexOf(ext) != -1) {
+			var url = window.location.href.split('/');
+			window.location.assign(url.splice(0,url.length-1).join('/'));
+		}
+	</script>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="hold-transition skin-black fixed sidebar-mini">
+
+	<div class="wrapper">
+		<header class="main-header">
+			<a href="index.html" class="logo">
+				<span class="logo-mini titulo_projeto_mini"></span>
+				<span class="logo-lg titulo_projeto"></span>
+			</a>
+			<nav class="navbar navbar-static-top">
+				<!-- Sidebar toggle button-->
+				<a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</a>
+
+				<div class="navbar-custom-menu">
+					<ul class="nav navbar-nav">
+						<li class="dropdown user user-menu">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<img src="../img/user.png" class="foto-user user-image" alt="Foto do Perfil"
+									onerror="if (this.src != 'error.jpg') this.src = '../img/user.png';">
+								<!-- <span class="nome_usuario hidden-xs">Usuário</span> -->
+								<span class="nome_usuario">Usuário</span>
+							</a>
+							<ul class="dropdown-menu">
+								<!-- User image -->
+								<li class="user-header">
+									<img src="../img/user.png" class="foto-user img-circle" alt="Foto do Perfil"
+										onerror="if (this.src != 'error.jpg') this.src = '../img/user.png';">
+									<p>
+										<span class="nome_usuario">Usuário</span>
+										<small></small>
+									</p>
+								</li>
+								<li class="user-footer">
+									<div class="pull-left">
+										<a href="#" class="btn btn-default btn-flat">Perfil</a>
+									</div>
+									<div class="pull-right">
+										<a href="#" class="btn btn-default btn-flat btn-logoff">Sair</a>
+									</div>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</header>
+
+		<!-- =============================================== -->
+
+		<aside class="main-sidebar">
+			<section class="sidebar">
+				<div class="user-panel">
+					<div class="pull-left image">
+						<img src="../img/user.png" class="foto-user img-circle" alt="Foto do Perfil"
+							onerror="if (this.src != 'error.jpg') this.src = '../img/user.png';">
+						<!-- <img src="../img/user.png" class="img-circle" alt="User Image"> -->
+					</div>
+					<div class="pull-left info">
+						<p class="nome_usuario">Usuário</p>
+						<!-- <a href="#"><i class="fa fa-circle text-success"></i> Online</a> -->
+					</div>
+				</div>
+				<!-- <form action="#" method="get" class="sidebar-form">
+					<div class="input-group">
+						<input type="text" name="q" class="form-control" placeholder="Pesquisar...">
+						<span class="input-group-btn">
+							<button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+							</button>
+						</span>
+					</div>
+				</form> -->
+				<ul class="sidebar-menu" data-widget="tree"></ul>
+			</section>
+		</aside>
+
+		<div class="content-wrapper">
+			<section class="content-header">
+				<h1>
+					<span class="titulo_pagina">Carregando...</span>
+					<!-- <small>modelo</small> -->
+				</h1>
+				<ol class="breadcrumb"></ol><!-- Caminho para chegar na pagina -->
+			</section>
+
+			<section class="content">
+				<div class="box" id="conteudo_pagina"></div>
+			</section>
+		</div>
+
+		<footer class="main-footer">
+			<div class="pull-right hidden-xs">
+				<b>Versão</b> <span id="verionFoot"></span>
+			</div>
+			<strong>Criado por <spam id="developerFoot"></spam>.</strong> Todos os direitos reservados.
+		</footer>
+
+		<div class="control-sidebar-bg"></div>
+	</div>
+
+	<!-- START_LIB_FOOTER -->
+	<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="../biblioteca/bower_components/jquery-ui/jquery-ui.min.js"></script>
+	<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="../biblioteca/bower_components/datatables.net/datatables.min.js"></script>
+	<script src="../biblioteca/bower_components/select2/dist/js/select2.full.min.js"></script>
+	<script src="../biblioteca/bower_components/photoswipe/photoswipe.min.js"></script>
+	<script src="../biblioteca/bower_components/photoswipe/photoswipe-ui-default.min.js"></script>
+	<script src="../biblioteca/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="../biblioteca/bower_components/fastclick/lib/fastclick.js"></script>
+	<script src="../biblioteca/bower_components/datatables.net/datatables.min.js"></script>
+	<script src="../biblioteca/bower_components/select2/dist/js/select2.full.min.js"></script>
+	<script src="../biblioteca/bower_components/moment/moment.js"></script>
+	<script src="../biblioteca/bower_components/beeplay/dist/beeplay.min.js"></script>
+	<script src="../biblioteca/bower_components/platform/platform.js"></script>
+	<script src="../biblioteca/bower_components/jquery-browser-detection/jquery.browser.detection.min.js"></script>
+	<script src="../biblioteca/bower_components/jquery-mask/jquery.mask.min.js"></script>
+	<script src="../biblioteca/bower_components/amcharts/core.js"></script>
+	<script src="../biblioteca/bower_components/amcharts/charts.js"></script>
+	<script src="../biblioteca/bower_components/amcharts/animated.js"></script>
+	<script src="../biblioteca/bower_components/amcharts/pt_BR.js"></script>
+	<script src="../biblioteca/bower_components/toast/jquery.toast.min.js"></script>
+	<!-- END_LIB_FOOTER -->
+	<script src="../biblioteca/dist/js/adminlte.min.js"></script>
+	<script src="../biblioteca/dist/js/demo.js"></script>
+
+	<script>
+		var usuario_Global = JSON.parse(localStorage.getItem('usuario'));
+
+		$(document).ready(function() { 
+			updateLibs();
+		});
+
+		function logoff() { 
+			if (!confirm('Deseja sair da aplicação?')) return false;
+			localStorage.removeItem('usuario');
+			window.location.assign('index.html');
+		}
+
+		function updateUser() { 
+			ajax({
+				param: { 'updateUser': true },
+				done: function(data) { 
+					console.log(data);
+					data = JSON.parse(data);
+					console.log(data);
+					if (data.debug == 'NO_VALID') { 
+						var usuario_Global = JSON.parse(localStorage.getItem('usuario'));
+					} else if (data.debug == 'OK') { 
+						var usuario_Global = data;
+						localStorage.setItem('usuario', JSON.stringify(usuario_Global));
+					} else {
+						alert(data.debug);
+						localStorage.removeItem('usuario');
+						window.location.assign('../');
+					}
+				}
+			});
+		}
+
+		function updateLibs() { 
+			importLib("../js/resolvConfig.full.js");
+			importLib("../script.js");
+			preInit();
+		}
+
+		function preInit() { 
+			if ( 
+				window['objParamGrade_Global'] != undefined && 
+				window['ajax'] != undefined
+			) { 
+				$("#styleAdicional").html(""
+					+ 	"<style>"
+					+ 		"tr:hover > .celB{background-color: "+objParamGrade_Global.hoverTrTableColor+" !important;}"
+					+ 	"</style>"
+				);
+				initComponet();
+			} else { 
+				setTimeout(() => { preInit(); }, 10);
+			}
+		}
+
+		function importLib(path) { 
+			let ext = (path.split('.')).pop();
+			if (['js','css'].indexOf(ext.toLowerCase()) < 0) return false;
+
+			return new Promise(function (resolve, reject) { 
+				let client = new XMLHttpRequest();
+				client.open("HEAD", path, true);
+				client.onreadystatechange = function() { 
+					if (this.readyState == 2) { 
+						path += '?' + client.getResponseHeader("Last-Modified")
+						$('body').append(
+							ext.toLowerCase() == 'js'
+							? `<script src="${path}"></`+`script>`
+							: `<link rel="stylesheet" href="${path}">`
+						);
+					}
+				}
+				client.send();
+			});
+		}
+	</script>
+
+	<div id="styleAdicional"></div>
+	<script>
+		$("#styleAdicional").html(""
+			+ 	"<style>"
+			+ 		"tr:hover > .celB{background-color: "+objParamGrade_Global.hoverTrTableColor+" !important;}"
+			+ 	"</style>"
+		);
+	</script>
+</body>
+
+</html>

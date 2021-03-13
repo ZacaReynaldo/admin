@@ -1,0 +1,17 @@
+{
+	"nome_projeto": "Nome do Projeto",
+	"ip": "localhost|localhost:8088",
+	"path": "admin",
+	"login": {
+		"no_set_nome": true,
+		"login_desc": "Usuário",
+		"login_type": "text",
+		"login_maxlength": 3,
+		"background-color-origin": "#FF4546",
+		"background-color": "lightgray",
+		"background-color2": "white",
+		"logo_png": "logotipo"
+	},
+	"logo_png": "logo",
+	"logoMini_png": "logo-mini"
+}

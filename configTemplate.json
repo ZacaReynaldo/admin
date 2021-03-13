@@ -1,0 +1,38 @@
+{
+	"nome_projeto": "Nome do Projeto",
+	"login": {
+		"no_set_nome": true,
+		"login_desc": "Usuário",
+		"login_type": "text",
+		"login_maxlength": 3,
+		"logo_png": "logotipo"
+	},
+	"logo_png": "logo",
+	"logoMini_png": "logo-mini",
+	"principal": { 
+		"logo_png": "logo",
+		"logoMini_png": "logo-mini",
+		"color-app": "black",
+		"color-teste_menu": "black",
+		"color-nome_usuario": "#888888",
+		"foot": { 
+			"developer": "Developer"
+		},
+		"version": "1.0"
+	},
+	"menu": [
+		{
+			"header": "Menu Principal"
+		},
+		{
+			"desc": "Principal",
+			"file": "main",
+			"itens": [
+				{
+					"file": "file",
+					"desc": "Desc"
+				}
+			]
+		}
+	]
+}

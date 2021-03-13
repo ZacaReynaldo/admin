@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title class="titulo_projeto">Carregando...</title>
+	<link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="stylesheet" href="../biblioteca/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="../biblioteca/plugins/iCheck/square/blue.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+	<script>
+		var ext = (window.location.href.split('.')[1] || '').split('?')[0].split('#')[0];
+		if ((['html','php','htm']).indexOf(ext) != -1) { 
+			var url = window.location.href.split('/');
+			window.location.assign(url.splice(0,url.length-1).join('/'));
+		}
+	</script>
+</head>
+<body class="hold-transition login-page" style="height: auto;">
+	<div class="login-box">
+		<div class="login-logo">
+			<div style="width: 100%;text-align: center;" class="text-center">
+				<img src="" id="logoOficial" style="display:none;" alt="" width="100%">
+			</div>
+			<a href="#" class="titulo_projeto_login"></a>
+		</div>
+		<div class="login-box-body">
+			<form id='formCadastro' action="#" method="post">
+				<div id="formCadastroRender"></div>
+				<div class="row">
+					<div class="col-xs-8 linkAdicionais"></div>
+					<div class="col-xs-4">
+						<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="../biblioteca/plugins/iCheck/icheck.min.js"></script>
+	<script src="../js/resolvConfig.full.js"></script>
+	<script src="./form.js"></script>
+	<script>
+		$(function() { 
+			$('input').iCheck({
+				checkboxClass: 'icheckbox_square-blue',
+				radioClass: 'iradio_square-blue',
+				increaseArea: '20%' /* optional */
+			});
+		});
+
+		$(document).ready(function() {
+			$.ajax({
+				url: '../controller/login.php'
+				, type: 'POST'
+				, dataType: 'text'
+				, data: { 'getConfigCadastro': true }
+				, error: function() { 
+					alert('Falha ao fazer a requisição!');
+				}
+			}).done(function(data) { 
+				console.log(data);
+				data = JSON.parse(data);
+				console.log(data);
+
+				if ((data.no_set_nome || '') == '') { 
+					$(".titulo_projeto_login").html((data.nome_projeto || ''));
+				}
+				$(".titulo_projeto").html((data.nome_projeto || ''));
+
+				$("#login").attr('type', (data.login_type || 'text'));
+				if ((data.login_maxlength || '') != '') $("#login").attr('maxlength', data.login_maxlength);
+				$("#login_desc").html((data.login_desc || 'Login'));
+
+				if ((data.logo_png || '') != '') { 
+					$("#logoOficial").attr('src','../img/' + data.logo_png + '.png').css('display','block');
+				} else { 
+					$("#logoOficial").css('display','none');
+				}
+				$(".linkAdicionais").append('<div><a href="../login">' + data.linkLogin + '</a></div>');
+
+				if ((data.isForgetPassword || '') != '') { 
+					$(".linkAdicionais").append(''
+						+ '<div><a href="../password-reset">' + data.linkForgetPassword + '</a></div>'
+					);
+				}
+
+				resolvFormCadastro();
+			});
+		});
+
+		var cadastroAtual_Global = 0;
+		var formularioCadastro_Global = {};
+		$("#formCadastro").submit(function(e) { 
+			e.preventDefault();
+			var form = getForm(form_Global[cadastroAtual_Global]);
+			if (!form.valid) return;
+
+			formularioCadastro_Global = $.extend({}, formularioCadastro_Global, form.param);
+			if (cadastroAtual_Global == form_Global.length-1) { 
+				enviarFormulario();
+			} else { 
+				cadastroAtual_Global++;
+				resolvFormCadastro();
+			}
+		});
+
+		function resolvFormCadastro() { 
+			var row = [form_Global[cadastroAtual_Global]];
+			$("#formCadastroRender").html(
+				resolvConfig([ { row }
+					, { row: [ 
+						{ button: { 
+							desc: 'Voltar', classDiv: 'col-md-6', class: 'btn btn-default btn-block'
+							, style: { 
+								'display': cadastroAtual_Global == 0 ? 'none' : 'block'
+							}
+						} },
+						{ button: { 
+							desc: cadastroAtual_Global == form_Global.length-1 ? 'Finalizar' : 'Prosseguir'
+							, classDiv: 'col-md-6', class: 'btn btn-block btn-primary'
+						} },
+					] }
+				], 0, true)
+			);
+		}
+	</script>
+</body>
+</html>

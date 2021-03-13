@@ -1,0 +1,63 @@
+.estiloTooltips { 
+	color: white;
+	font-size: 15px;
+}
+
+@media only screen and (max-width: 950px) { 
+	.estiloTooltips { 
+		font-size: 10px;
+	}
+}
+
+@media only screen and (max-width: 850px) { 
+	.estiloTooltips { 
+		font-size: 9px;
+	}
+}
+
+@media only screen and (max-width: 800px) { 
+	.estiloTooltips { 
+		font-size: 8px;
+	}
+}
+
+canvas { 
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+#chartjs-tooltip { 
+	opacity: 1;
+	position: absolute;
+	background: rgba(0, 0, 0, .7);
+	color: white;
+	border-radius: 3px;
+	-webkit-transition: all .1s ease;
+	transition: all .1s ease;
+	pointer-events: none;
+	-webkit-transform: translate(-50%, 0);
+	transform: translate(-50%, 0);
+}
+
+.chartjs-tooltip-key { 
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-right: 10px;
+}
+
+.rodape { 
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 10%;
+	height: 25px;
+	padding: 2px;
+	padding-top: 5px;
+	font-size: 12px;
+	background-color: lightgray;
+	color: black;
+	text-align: center;
+	border-top-right-radius: 10px;
+}

@@ -1,0 +1,29 @@
+@font-face {
+	font-family: calibriWin;
+	src: url("../font/calibri.ttf");
+}
+@font-face {
+	font-family: NomeDaFont;
+	/* src: url(font/calibri.ttf); */
+	/* src: url("../font/osaka-re.ttf"); */
+	src: url(../font/calibri.ttf);
+}
+
+
+/* width */ 			::-webkit-scrollbar 				{ width: 5px; height: 15px; border-radius:10px; }
+/* Track */ 			::-webkit-scrollbar-track 			{ background: #f1f1f1; 	border-radius:10px; }
+/* Handle */ 			::-webkit-scrollbar-thumb 			{ background: #888; 	border-radius:10px; /* background: black;  */ }
+/* Handle on hover */	::-webkit-scrollbar-thumb:hover 	{ background: #a55; 	border-radius:10px; }
+
+
+@media only screen and (max-width: 600px) {
+	/* width */ 			::-webkit-scrollbar 				{ width: 5px; height: 5px; border-radius:10px; }
+	/* Track */ 			::-webkit-scrollbar-track 			{ background: #f1f1f1; 	border-radius:10px; }
+	/* Handle */ 			::-webkit-scrollbar-thumb 			{ background: #888; 	border-radius:10px; /* background: black;  */ }
+	/* Handle on hover */	::-webkit-scrollbar-thumb:hover 	{ background: #a55; 	border-radius:10px; }
+
+}
+
+.cursorClick{
+	cursor: pointer;
+}
