@@ -20,12 +20,13 @@ class Conexao {
 		if ($this->db_driver == 'firebird') { 
 			$dt_encode = $config->dt_encode;
 
-			self::$conexao = ibase_connect(
-				$db_host . '\\' . $db_nome
-				, $db_usuario
-				, $db_senha
-				, $dt_encode
-			) or die("Ibase: Não foi possível conectar-se ao servidor [$db_host/$db_nome].");
+			eval("
+			self::\$conexao = ibase_connect(
+				\$db_host . '\\' . \$db_nome
+				, \$db_usuario
+				, \$db_senha
+				, \$dt_encode
+			) or die(\"Ibase: Não foi possível conectar-se ao servidor [\$db_host/\$db_nome].\");");
 		}
 		if ($this->db_driver == 'mysql') { 
 			try { 
@@ -67,7 +68,7 @@ class Conexao {
 
 	public static function Connect() { 
 		if (!isset(self::$conexao)) { 
-			new Conexao($this->path);
+			eval("new Conexao(\$this->path);");
 		}
 		return self::$conexao;
 	}
@@ -158,10 +159,11 @@ function padraoResultado($pdo, $sql, $msm='Nenhum resultado encontrado!') {
 	$arrayResultado = array();
 
 	if (gettype($pdo) == 'resource') { 
-		$resultado = ibase_query($pdo, $sql);
-		$row = ibase_fetch_object($resultado);
-		if (empty($row)) 	array_push($arrayResultado, new FalseDebug($msm));
-		else 			do 	array_push($arrayResultado, new Generico($row, true)); while($row = ibase_fetch_object($resultado));
+		eval("
+		\$resultado = ibase_query(\$pdo, \$sql);
+		\$row = ibase_fetch_object(\$resultado);
+		if (empty(\$row)) 	array_push(\$arrayResultado, new FalseDebug(\$msm));
+		else 			do 	array_push(\$arrayResultado, new Generico(\$row, true)); while(\$row = ibase_fetch_object(\$resultado));");
 	} else { 
 		$verifica = $pdo->query($sql);
 		foreach ($verifica as $dados) { 
@@ -176,12 +178,13 @@ function padraoExecute($pdo, $sql, $table='') {
 	$sql = getQuery($pdo, $sql);
 
 	if (gettype($pdo) == 'resource') { 
-		$resultado = ibase_query($pdo, $sql);
-		COMMIT_WORK($pdo);
-		if ($table) { 
-			$resultado = ibase_fetch_row($resultado);
-			$resultado = $resultado['0'];
-		}
+		eval("
+		\$resultado = ibase_query(\$pdo, \$sql);
+		COMMIT_WORK(\$pdo);
+		if (\$table) { 
+			\$resultado = ibase_fetch_row(\$resultado);
+			\$resultado = \$resultado['0'];
+		};");
 	} else { 
 		$stmt = $pdo->prepare($sql);
 		$resultado = $stmt->execute();
@@ -201,8 +204,7 @@ function padraoExecute($pdo, $sql, $table='') {
 }
 
 function COMMIT_WORK($pdo) { 
-	$sql = "COMMIT WORK;";
-	$resultado = ibase_query($pdo, $sql);
+	eval("\$resultado = ibase_query(\$pdo, \"COMMIT WORK;\");");
 }
 
 function printQuery($sql, $isHtml=false, $boolComentario=false) { 
@@ -256,7 +258,7 @@ function printQuery($sql, $isHtml=false, $boolComentario=false) {
 }
 
 function eviarEmail($title, $body, $email) { 
-	require('../biblioteca/PHPMailer/class.phpmailer.php');
+	// require('../biblioteca/PHPMailer/class.phpmailer.php');
 
 	$EMAIL_ENVIO_AUTOMATICO 		= 'email';
 	$SMTP_ENVIAEMAIL 				= 'server';
@@ -459,8 +461,8 @@ function ctxFile($file) {
 	return $ctx;
 }
 
-function copyFile($orign, $dist) { 
-	$file = ctxFile($orign);
+function copyFile($origin, $dist) { 
+	$file = ctxFile($origin);
 	return createFile($dist, $file);
 }
 
@@ -500,6 +502,52 @@ function listDir($path) {
 		$dir->set('Not Dir', 'name');
 	}
 	return $dir;
+}
+
+function copyDir($dirOrigin, $dirDist) { 
+	if (is_dir($dirOrigin)) { 
+		if (!is_dir($dirDist)) mkdir($dirDist);
+
+		$objects = scandir($dirOrigin);
+		foreach ($objects as $object) { 
+			if ($object != '.' && $object != '..') { 
+				if (is_dir($dirOrigin . DIRECTORY_SEPARATOR . $object)) { 
+					mkdir($dirDist . DIRECTORY_SEPARATOR . $object);
+					copyDir(
+						$dirOrigin . DIRECTORY_SEPARATOR . $object, 
+						$dirDist . DIRECTORY_SEPARATOR . $object
+					);
+				} else if (is_file($dirOrigin . DIRECTORY_SEPARATOR . $object)) { 
+					copyFile(
+						$dirOrigin . DIRECTORY_SEPARATOR . $object, 
+						$dirDist . DIRECTORY_SEPARATOR . $object
+					);
+				}
+			}
+		}
+	}
+}
+
+function removeDir($dir) { 
+	if (is_dir($dir)) { 
+		$objects = scandir($dir);
+		foreach ($objects as $object) { 
+			if ($object != '.' && $object != '..') { 
+				if (is_dir($dir . DIRECTORY_SEPARATOR . $object)) { 
+					removeDir($dir . DIRECTORY_SEPARATOR . $object);
+				} else if (is_file($dir . DIRECTORY_SEPARATOR . $object)) { 
+					if (!unlink($dir . DIRECTORY_SEPARATOR . $object)) { 
+						// code in case the file was not removed
+					}
+					// wait a bit here?
+				} else { 
+					// code for debug file permission issues
+				}
+			}
+		}
+		reset($objects);
+		rmdir($dir);
+	}
 }
 
 function deleteFile($file) { 
