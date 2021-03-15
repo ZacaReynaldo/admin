@@ -9,11 +9,11 @@ logo-mini.png
 logo.png
 form.js
 
-controller/config/*
-controller/ClassSQL/*
-script/*
-img/*
-view/*
+/controller/config/
+/controller/ClassSQL/
+/script/
+/img/
+/view/
 
 *.env
 !configTemplate.env
