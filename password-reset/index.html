@@ -28,6 +28,9 @@
 			</div>
 			<a href="#" class="titulo_projeto_login"></a>
 		</div>
+		<div class="text-center">
+			<h3 class="tituloPagina"></h3>
+		</div>
 		<div class="login-box-body">
 			<form id='formEmalPasswordReset' action="#" method="post">
 				E-mail:
@@ -37,7 +40,7 @@
 				<div class="row">
 					<div class="col-xs-8 linkAdicionais"></div>
 					<div class="col-xs-4">
-						<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+						<button type="submit" class="btn btn-primary btn-block btn-flat">Enviar</button>
 					</div>
 				</div>
 			</form>
@@ -82,11 +85,12 @@
 					$("#logoOficial").css('display','none');
 				}
 
+				$(".tituloPagina").html(data.link || "Perdeu a Senha?");
 				$(".linkAdicionais").append('<div><a href="../login">' + data.linkLogin + '</a></div>');
 
 				if ((data.isCadastro || '') != '') { 
 					$(".linkAdicionais").append(''
-						+ '<div><a href="../cadastro">' + data.linkCadastro + '</a></div>'
+						+ '<div><a href="../create-user">' + data.linkCadastro + '</a></div>'
 					);
 				}
 			});
@@ -98,7 +102,7 @@
 				  url: '../controller/login.php'
 				, type: 'POST'
 				, dataType: 'text'
-				, data: { 'email': $("#email").val() }
+				, data: { 'passwordReset': true, 'email': $("#email").val() }
 				, error: function() { 
 					alert('Falha ao fazer a requisição!');
 				}

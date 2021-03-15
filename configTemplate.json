@@ -7,6 +7,15 @@
 		"login_maxlength": 3,
 		"logo_png": "logotipo"
 	},
+	"forget_password": { 
+		"no_set_nome": true,
+		"email_maxlength": 50,
+		"link": "Perdeu a Senha?"
+	},
+	"cadastro": { 
+		"no_set_nome": true,
+		"link": "Cadastre-se"
+	},
 	"logo_png": "logo",
 	"logoMini_png": "logo-mini",
 	"principal": { 

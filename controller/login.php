@@ -114,7 +114,7 @@ if (!empty($_POST['login']) && !empty($_POST['senha'])) {
 	echo toJson(array($usuario));
 }
 
-if (!empty($_POST['email'])) { 
+if (!empty($_POST['passwordReset'])) { 
 	$email = $_POST['email'];
 
 	$sql = "SELECT 	NOME
@@ -179,9 +179,14 @@ if (!empty($_POST['email'])) {
 	}
 }
 
-if (!empty($_POST['cep'])) { 
+if (!empty($_POST['buscarCep'])) { 
 	$cep = $_POST['cep'];
 	echo file_get_contents("https://viacep.com.br/ws/$cep/json/");
+}
+
+if (!empty($_POST['enviarFormulario'])) { 
+	if (is_file('../create-user/form.php')) include '../create-user/form.php';
+	else echo 'Não encontrou função para resolver o cadastro!';
 }
 
 ?>

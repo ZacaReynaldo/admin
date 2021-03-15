@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
 	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="../biblioteca/plugins/iCheck/square/blue.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/toast/jquery.toast.min.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 	<script>
 		var ext = (window.location.href.split('.')[1] || '').split('?')[0].split('#')[0];
@@ -22,27 +23,34 @@
 </head>
 <body class="hold-transition login-page" style="height: auto;">
 	<div class="login-box">
-		<div class="login-logo">
+		<div class="login-logo" style="margin:0">
 			<div style="width: 100%;text-align: center;" class="text-center">
 				<img src="" id="logoOficial" style="display:none;" alt="" width="100%">
 			</div>
 			<a href="#" class="titulo_projeto_login"></a>
 		</div>
+		<div class="text-center">
+			<h3 class="tituloPagina" style="margin-top:0"></h3>
+		</div>
 		<div class="login-box-body">
 			<form id='formCadastro' action="#" method="post">
 				<div id="formCadastroRender"></div>
+				<br>
 				<div class="row">
-					<div class="col-xs-8 linkAdicionais"></div>
-					<div class="col-xs-4">
+					<div class="col-xs-12 text-center linkAdicionais"></div>
+					<!-- <div class="col-xs-4">
 						<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
-					</div>
+					</div> -->
 				</div>
 			</form>
 		</div>
+		<br><br>
 	</div>
 	<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="../biblioteca/plugins/iCheck/icheck.min.js"></script>
+	<script src="../biblioteca/bower_components/jquery-mask/jquery.mask.min.js"></script>
+	<script src="../biblioteca/bower_components/toast/jquery.toast.min.js"></script>
 	<script src="../js/resolvConfig.full.js"></script>
 	<script src="./form.js"></script>
 	<script>
@@ -82,6 +90,9 @@
 				} else { 
 					$("#logoOficial").css('display','none');
 				}
+
+				$(".tituloPagina").html(data.link || "Cadastre-se");
+
 				$(".linkAdicionais").append('<div><a href="../login">' + data.linkLogin + '</a></div>');
 
 				if ((data.isForgetPassword || '') != '') { 
@@ -90,45 +101,145 @@
 					);
 				}
 
+				form_Global.forEach(function(array, i) { 
+					Object.keys(form_Global[i]).forEach(function(obj) { 
+						Object.keys(form_Global[i][obj]).forEach(function(key) { 
+							var campo = form_Global[i][obj][key];
+							// Iniciar evento de keyup para definir o value do campo
+							if (key == 'input' && ((campo['id'] || '') != '')) { 
+								eval(`
+								form_Global[${i}]["${obj}"]["${key}"]['onkeyup'] = function() { 
+									form_Global[${i}]["${obj}"]["${key}"]['value'] = resolvVal("${campo['id']}");
+								}`);
+							}
+							// Iniciar evento de click para definir o value do campo
+							if (key == 'input' 
+								&& (((campo['radio'] || '') != '') || ((campo['checkbox'] || '') != ''))
+								&& (((campo['id'] || '') != '') || ((campo['name'] || '') != ''))
+							) { 
+								var identifica = ((campo['id'] || '') != '') ? 'id' : 'name';
+								eval(`
+								form_Global[${i}]["${obj}"]["${key}"]['onclick'] = function() { 
+									form_Global[${i}]["${obj}"]["${key}"]['value'] = resolvVal("${campo[identifica]}");
+								}`);
+							}
+						});
+					});
+				});
+
 				resolvFormCadastro();
 			});
 		});
 
 		var cadastroAtual_Global = 0;
 		var formularioCadastro_Global = {};
-		$("#formCadastro").submit(function(e) { 
-			e.preventDefault();
-			var form = getForm(form_Global[cadastroAtual_Global]);
-			if (!form.valid) return;
-
-			formularioCadastro_Global = $.extend({}, formularioCadastro_Global, form.param);
-			if (cadastroAtual_Global == form_Global.length-1) { 
-				enviarFormulario();
-			} else { 
-				cadastroAtual_Global++;
-				resolvFormCadastro();
-			}
-		});
+		$("#formCadastro").submit(function(e) { e.preventDefault(); });
 
 		function resolvFormCadastro() { 
-			var row = [form_Global[cadastroAtual_Global]];
+			var row = [], idFocus = '';
+			Object.keys(form_Global[cadastroAtual_Global]).forEach(function(obj) { 
+				var indice = row.length;
+				row.push({});
+				Object.keys(form_Global[cadastroAtual_Global][obj]).forEach(function(key) { 
+					row[indice][key] = form_Global[cadastroAtual_Global][obj][key];
+					if ((form_Global[cadastroAtual_Global][obj][key]['autofocus'] || '') != '') { 
+						idFocus = form_Global[cadastroAtual_Global][obj][key]['id'];
+					}
+				});
+			});
+
 			$("#formCadastroRender").html(
 				resolvConfig([ { row }
 					, { row: [ 
 						{ button: { 
-							desc: 'Voltar', classDiv: 'col-md-6', class: 'btn btn-default btn-block'
+							desc: 'Voltar', classDiv: 'col-xs-6', class: 'btn btn-default btn-block'
 							, style: { 
 								'display': cadastroAtual_Global == 0 ? 'none' : 'block'
+							}
+							, styleDiv: { 'margin-top':'10px','padding-left':'0' }
+							, click: function() { 
+								cadastroAtual_Global--;
+								resolvFormCadastro();
 							}
 						} },
 						{ button: { 
 							desc: cadastroAtual_Global == form_Global.length-1 ? 'Finalizar' : 'Prosseguir'
-							, classDiv: 'col-md-6', class: 'btn btn-block btn-primary'
+							, classDiv: 'col-xs-6', class: 'btn btn-block btn-primary'
+							, styleDiv: { 'margin-top':'10px','padding-right':'0' }
+							, click: function() { 
+								var form = getForm(form_Global[cadastroAtual_Global]);
+								if (!form.valid) return;
+
+								formularioCadastro_Global = $.extend({}, formularioCadastro_Global, form.param);
+								if (cadastroAtual_Global == form_Global.length-1) { 
+									enviarFormulario();
+								} else { 
+									cadastroAtual_Global++;
+									resolvFormCadastro();
+								}
+							}
 						} },
 					] }
 				], 0, true)
 			);
+			setTimeout(function() { 
+				try { initForm(); } catch(e) {}
+
+				if (idFocus != '')
+					try { resolvFocus(idFocus); } catch(e) {}
+			}, 100);
 		}
+
+		function enviarFormulario() { 
+			var param = {}, valid = true;
+
+			form_Global.forEach(function(form) { 
+				var getFormObj = getForm(form, { onlyValuePre: true });
+				if (!getFormObj.valid) valid = getFormObj.valid;
+
+				param = $.extend({}, param, getFormObj.param);
+			});
+
+			param.enviarFormulario = true;
+			console.log(param);
+
+			if (!valid) return;
+
+			$.ajax({
+				url: '../controller/login.php'
+				, type: 'POST'
+				, dataType: 'text'
+				, data: param
+				, error: function() { alert('Falha ao enviar formulario!'); }
+			}).done(function(data) { 
+				console.log(data);
+				alert(data == '1' ? 'Cadastro feito com sucesso!' : 'Falha ao fazer cadastro: ' + data);
+				if (data == '1') { 
+					setTimeout(function() { 
+						window.location.assign('../login');
+					}, 2000);
+				}
+			});
+		}
+
+		var alertOld = alert;
+		setTimeout(function() { 
+			alert = function(text, options={}) { 
+				try { 
+					$.toast({ 
+						heading: options.head || $(".titulo_pagina").html() || 'Aviso',
+						text,
+						showHideTransition: options.animation || 'slide',
+						icon: options.icon || 'warning',
+						position: options.position || "top-right",
+						loaderBg: options.loaderBg || '#11ACED'
+					});
+				} catch(e) { 
+					// console.error(e);
+					alertOld(text);
+				}
+			}
+		}, 500);
 	</script>
 </body>
 </html>
