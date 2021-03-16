@@ -6,9 +6,9 @@ date_default_timezone_set('America/Sao_Paulo');
 // Import PHPMailer classes into the global namespace
 // These must be at the top of your script, not inside a function
 
-// use PHPMailer\PHPMailer\PHPMailer;
-// use PHPMailer\PHPMailer\SMTP;
-// use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 // Load Composer's autoloader
 require '../vendor/autoload.php';
@@ -24,6 +24,8 @@ if (!empty($_POST['getConfigLogin'])) {
 		echo '{}';
 	}
 	$config->login->nome_projeto = $config->nome_projeto;
+
+	if (isset($config->colorLoadAlert)) $config->login->colorLoadAlert = $config->colorLoadAlert;
 
 	if (isset($config->cadastro)) { 
 		$config->login->isCadastro = true;
@@ -49,6 +51,8 @@ if (!empty($_POST['getConfigCadastro'])) {
 	}
 	$config->cadastro->nome_projeto = $config->nome_projeto;
 
+	if (isset($config->colorLoadAlert)) $config->cadastro->colorLoadAlert = $config->colorLoadAlert;
+
 	if (isset($config->forget_password)) { 
 		$config->cadastro->isForgetPassword = true;
 		$config->cadastro->linkForgetPassword = isset($config->forget_password->link) ? $config->forget_password->link : 'Esqueceu Senha?';
@@ -69,6 +73,8 @@ if (!empty($_POST['getConfigForgetPassword'])) {
 		echo '{}';
 	}
 	$config->forget_password->nome_projeto = $config->nome_projeto;
+
+	if (isset($config->colorLoadAlert)) $config->forget_password->colorLoadAlert = $config->colorLoadAlert;
 
 	if (isset($config->cadastro)) { 
 		$config->forget_password->isCadastro = true;
@@ -137,12 +143,14 @@ if (!empty($_POST['passwordReset'])) {
 	try { 
 		// Server settings
 		// $mail->SMTPDebug 	= SMTP::DEBUG_SERVER; 						// Enable verbose debug output
-		$mail->isSMTP(); 												// Send using SMTP
-		$mail->Host 		= $configEnv->password_reset__host; 		// Set the SMTP server to send through
-		$mail->SMTPAuth 	= true; 									// Enable SMTP authentication
-		$mail->Username 	= $configEnv->password_reset__email; 		// SMTP username
-		$mail->Password 	= $configEnv->password_reset__psw; 			// SMTP password
-		
+		$mail->isSMTP();
+		// $mail->SMTPDebug  	= 1; 										// Send using SMTP
+		$mail->CharSet 			= 'UTF-8';
+		$mail->Host 			= $configEnv->password_reset__host; 		// Set the SMTP server to send through
+		$mail->SMTPAuth 		= true; 									// Enable SMTP authentication
+		$mail->Username 		= $configEnv->password_reset__email; 		// SMTP username
+		$mail->Password 		= $configEnv->password_reset__psw; 			// SMTP password
+
 		if ($configEnv->password_reset__isGmail) { 
 			// $mail->SMTPSecure 	= PHPMailer::ENCRYPTION_SMTPS; 		// Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
 			$mail->SMTPSecure 	= 'ssl';
@@ -166,14 +174,41 @@ if (!empty($_POST['passwordReset'])) {
 		// $mail->addAttachment('/var/tmp/file.tar.gz'); 				// Add attachments
 		// $mail->addAttachment('/tmp/image.jpg', 'new.jpg'); 			// Optional name
 
+
+		// $_SERVER["HTTP_HOST"]; 			// "localhost" 
+		// $_SERVER["REQUEST_SCHEME"]; 		// "http" 
+		// $_SERVER["SCRIPT_FILENAME"]; 	// "E:/servidor/admin/controller/login.php" 
+		// $_SERVER["DOCUMENT_ROOT"]; 		// "E:/servidor" 
+		$link = $_SERVER["SCRIPT_FILENAME"]; // "E:/servidor/admin/controller/login.php" 
+		$link = explode('/', $link);
+		array_splice($link, sizeof($link)-2, 2);
+		$link = implode('/', $link);
+		// $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"] . ':' . $_SERVER["SERVER_PORT"], 
+		$link = str_replace(
+			$_SERVER["DOCUMENT_ROOT"], 
+			$_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"], 
+			$link
+		);
+		$link .= '/password-reset';
+
+		$body = require './template/password-reset.php';
+		$body = str_replace('NOME_EMPRESA'				, $configEnv->password_reset__name			, $body);
+		$body = str_replace('ENDERECO_EMPRESA'			, $configEnv->password_reset__endereco		, $body);
+		$body = str_replace('SITE_EMPRESA'				, $configEnv->password_reset__site			, $body);
+		$body = str_replace('EMAIL_CONTATO_EMPRESA'		, $configEnv->password_reset__emailContato	, $body);
+		$body = str_replace('NOME_USUARIO'				, $usuario->get('NOME')						, $body);
+		$body = str_replace('EMAIL_USUARIO'				, $email									, $body);
+		$body = str_replace('LINK_REDEFINIR_SENHA'		, $link										, $body);
+
 		// Content
 		$mail->isHTML(true); 											// Set email format to HTML
-		$mail->Subject 	= 'Esse E-mail é para recuperar senha';
-		$mail->Body 	= ''; 											// Is HTML
+		$mail->Subject 	= 'Confirmar alteração de senha do perfil ' . $usuario->get('NOME');
+		$mail->Body 	= $body; 				// Is HTML
 		$mail->AltBody 	= ''; 											// Text Plain
+		$mail->AddEmbeddedImage('../img/logo.png', 'logo_ref');
 
 		$mail->send();
-		echo 'Mensagem foi enviada com sucesso';
+		echo '1';
 	} catch (Exception $e) { 
 		echo "Falha ao enviar mensagem. Error: {$mail->ErrorInfo}";
 	}
@@ -184,9 +219,6 @@ if (!empty($_POST['buscarCep'])) {
 	echo file_get_contents("https://viacep.com.br/ws/$cep/json/");
 }
 
-if (!empty($_POST['enviarFormulario'])) { 
-	if (is_file('../create-user/form.php')) include '../create-user/form.php';
-	else echo 'Não encontrou função para resolver o cadastro!';
-}
+if (is_file('../create-user/form.php')) include '../create-user/form.php';
 
 ?>

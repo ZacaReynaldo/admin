@@ -1,6 +1,9 @@
 {
 	"nome_projeto": "Nome do Projeto",
-	"login": {
+	"logo_png": "logo",
+	"logoMini_png": "logo-mini",
+	"colorLoadAlert": "#11ACED",
+	"login": { 
 		"no_set_nome": true,
 		"login_desc": "Usuário",
 		"login_type": "text",
@@ -16,8 +19,6 @@
 		"no_set_nome": true,
 		"link": "Cadastre-se"
 	},
-	"logo_png": "logo",
-	"logoMini_png": "logo-mini",
 	"principal": { 
 		"logo_png": "logo",
 		"logoMini_png": "logo-mini",

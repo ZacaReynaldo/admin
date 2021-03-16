@@ -33,16 +33,14 @@
 			<h3 class="tituloPagina" style="margin-top:0"></h3>
 		</div>
 		<div class="login-box-body">
-			<form id='formCadastro' action="#" method="post">
-				<div id="formCadastroRender"></div>
-				<br>
-				<div class="row">
-					<div class="col-xs-12 text-center linkAdicionais"></div>
-					<!-- <div class="col-xs-4">
-						<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
-					</div> -->
-				</div>
-			</form>
+			<div id="formCadastroRender"></div>
+			<br>
+			<div class="row">
+				<div class="col-xs-12 text-center linkAdicionais"></div>
+				<!-- <div class="col-xs-4">
+					<button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+				</div> -->
+			</div>
 		</div>
 		<br><br>
 	</div>
@@ -62,7 +60,8 @@
 			});
 		});
 
-		$(document).ready(function() {
+		var loaderBg_Global;
+		$(document).ready(function() { 
 			$.ajax({
 				url: '../controller/login.php'
 				, type: 'POST'
@@ -100,6 +99,7 @@
 						+ '<div><a href="../password-reset">' + data.linkForgetPassword + '</a></div>'
 					);
 				}
+				loaderBg_Global	= data.colorLoadAlert || '#11ACED';
 
 				form_Global.forEach(function(array, i) { 
 					Object.keys(form_Global[i]).forEach(function(obj) { 
@@ -149,36 +149,61 @@
 			});
 
 			$("#formCadastroRender").html(
-				resolvConfig([ { row }
+				resolvConfig([ { row } 
 					, { row: [ 
-						{ button: { 
-							desc: 'Voltar', classDiv: 'col-xs-6', class: 'btn btn-default btn-block'
-							, style: { 
-								'display': cadastroAtual_Global == 0 ? 'none' : 'block'
-							}
-							, styleDiv: { 'margin-top':'10px','padding-left':'0' }
-							, click: function() { 
-								cadastroAtual_Global--;
-								resolvFormCadastro();
-							}
-						} },
-						{ button: { 
-							desc: cadastroAtual_Global == form_Global.length-1 ? 'Finalizar' : 'Prosseguir'
-							, classDiv: 'col-xs-6', class: 'btn btn-block btn-primary'
-							, styleDiv: { 'margin-top':'10px','padding-right':'0' }
-							, click: function() { 
-								var form = getForm(form_Global[cadastroAtual_Global]);
-								if (!form.valid) return;
-
-								formularioCadastro_Global = $.extend({}, formularioCadastro_Global, form.param);
-								if (cadastroAtual_Global == form_Global.length-1) { 
-									enviarFormulario();
-								} else { 
-									cadastroAtual_Global++;
+						{ div: { ctx: [ 
+							{ button: { 
+								desc: 'Voltar', classDiv: 'col-xs-6', class: 'btn btn-default btn-block'
+								, style: { 
+									'display': cadastroAtual_Global == 0 ? 'none' : 'block'
+								}
+								, styleDiv: { 'margin-top':'10px','padding-left':'0' }
+								, click: function() { 
+									cadastroAtual_Global--;
 									resolvFormCadastro();
 								}
-							}
-						} },
+							} },
+							{ button: { 
+								desc: cadastroAtual_Global == form_Global.length-1 ? 'Finalizar' : 'Prosseguir'
+								, classDiv: 'col-xs-6', class: 'btn btn-block btn-primary'
+								, styleDiv: { 'margin-top':'10px','padding-right':'0' }
+								, click: function() { 
+									var form = getForm(form_Global[cadastroAtual_Global]);
+									if (!form.valid) return;
+	
+									$.ajax({ 
+										url: '../controller/login.php',
+										type: 'POST',
+										dataType: 'text',
+										data: $.extend({}
+											, JSON.parse(`{"validForm${cadastroAtual_Global}":true}`)
+											, form.param
+										),
+										error: function() { alert('Falha ao tentar validar o formulario!'); }
+									}).done(function(data) { 
+										console.log(data);
+	
+										if (data != '') { 
+											try { 
+												data = JSON.parse(data);
+												console.log(data);
+												alert(data.debug);
+											} catch(e) { 
+												alert(data);
+											}
+										} else { 
+											formularioCadastro_Global = $.extend({}, formularioCadastro_Global, form.param);
+											if (cadastroAtual_Global == form_Global.length-1) { 
+												enviarFormulario();
+											} else { 
+												cadastroAtual_Global++;
+												resolvFormCadastro();
+											}
+										}
+									});
+								}
+							} },
+						] } }
 					] }
 				], 0, true)
 			);
@@ -193,12 +218,11 @@
 		function enviarFormulario() { 
 			var param = {}, valid = true;
 
-			form_Global.forEach(function(form) { 
-				var getFormObj = getForm(form, { onlyValuePre: true });
-				if (!getFormObj.valid) valid = getFormObj.valid;
+			var getFormObj = getForm(form_Global, { onlyValuePre: true });
+			if (!getFormObj.valid) valid = getFormObj.valid;
+			param = getFormObj.param;
 
-				param = $.extend({}, param, getFormObj.param);
-			});
+			$("#formCadastroRender").find('button').attr('disabled',true);
 
 			param.enviarFormulario = true;
 			console.log(param);
@@ -210,15 +234,25 @@
 				, type: 'POST'
 				, dataType: 'text'
 				, data: param
-				, error: function() { alert('Falha ao enviar formulario!'); }
+				, error: function() {
+					alert('Falha ao enviar formulario!');
+				}
 			}).done(function(data) { 
 				console.log(data);
-				alert(data == '1' ? 'Cadastro feito com sucesso!' : 'Falha ao fazer cadastro: ' + data);
-				if (data == '1') { 
-					setTimeout(function() { 
-						window.location.assign('../login');
-					}, 2000);
+
+				if (data != '1') { 
+					try { 
+						data = JSON.parse(data);
+						data = data.debug;
+					} catch(e) { }
+					// return alert('Falha: ' + data);
+					return alert('Falha: ' + data, { icon: 'danger' });
 				}
+
+				alert('Cadastro feito com sucesso!', { icon: 'success' });
+				setTimeout(function() { 
+					window.location.assign('../login');
+				}, 2500);
 			});
 		}
 
@@ -232,7 +266,7 @@
 						showHideTransition: options.animation || 'slide',
 						icon: options.icon || 'warning',
 						position: options.position || "top-right",
-						loaderBg: options.loaderBg || '#11ACED'
+						loaderBg: options.loaderBg || loaderBg_Global
 					});
 				} catch(e) { 
 					// console.error(e);
