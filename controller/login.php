@@ -119,8 +119,8 @@ if (!empty($_POST['loginSystem']) && !empty($_POST['login']) && !empty($_POST['s
 if (!empty($_POST['passwordReset'])) { 
 	$email = $_POST['email'];
 
-	$sql = "SELECT 	USUARIO.D_USUARIO
-			, 		USUARIO.OME
+	$sql = "SELECT 	USUARIO.ID_USUARIO
+			, 		USUARIO.NOME
 			FROM 	USUARIO
 			WHERE 	USUARIO.EMAIL 		= '$email'
 			AND 	USUARIO.CK_INATIVO 	= 0";
@@ -147,7 +147,7 @@ if (!empty($_POST['passwordReset'])) {
 	// $_SERVER["REQUEST_SCHEME"]; 			// "http" 
 	// $_SERVER["SCRIPT_FILENAME"]; 		// "E:/servidor/admin/controller/login.php" 
 	// $_SERVER["DOCUMENT_ROOT"]; 			// "E:/servidor" 
-	$link = $_SERVER["SCRIPT_FILENAME"]; 	// "E:/servidor/admin/controller/login.php" 
+	$link = $_SERVER["SCRIPT_FILENAME"]; // "E:/servidor/admin/controller/login.php" 
 	$link = explode('/', $link);
 	array_splice($link, sizeof($link)-2, 2);
 	$link = implode('/', $link);

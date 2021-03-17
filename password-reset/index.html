@@ -34,11 +34,11 @@
 		</div>
 		<div class="login-box-body">
 			<form id='formEmalPasswordReset' action="#" method="post">
-				E-mail:
+				<label for="email">E-mail:</label>
 				<div class="form-group has-feedback">
 					<input type="email" class="form-control" id="email" name="email" required autofocus>
 				</div>
-				<div id="obsEnvioEmail"></div>
+				<div id="obsEnvioEmail" style="color:black;margin-bottom:15px;font-size: 12px;"></div>
 				<div class="row">
 					<div class="col-xs-7 linkAdicionais"></div>
 					<div class="col-xs-5">
@@ -130,7 +130,8 @@
 					$("#obsEnvioEmail").html(''
 						+ 'E-mail enviado com sucesso!<br>'
 						+ 'Alguns e-mails podem ir para Caixa de Spam, verifique-a, caso não apareça na sua Caixa de Entrada'
-					);
+					).css('margin-bottom','15px');
+					alert('E-mail enviado com sucesso!', { icon: 'success' })
 				} else { 
 					alert('Falha ao enviar email: ' + data);
 				}
