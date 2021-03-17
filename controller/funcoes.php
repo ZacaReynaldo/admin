@@ -1,5 +1,9 @@
 <?php
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class Conexao { 
 	private static $conexao = null;
 	public $db_driver;
@@ -257,36 +261,6 @@ function printQuery($sql, $isHtml=false, $boolComentario=false) {
 	echo $sql;
 }
 
-function eviarEmail($title, $body, $email) { 
-	// require('../biblioteca/PHPMailer/class.phpmailer.php');
-
-	$EMAIL_ENVIO_AUTOMATICO 		= 'email';
-	$SMTP_ENVIAEMAIL 				= 'server';
-	$SENHA_EMAIL_ENVIO_AUTOMATICO 	= 'password';
-	$SMTP_PORTA 					= 'port';
-
-	$mail = new PHPMailer();
-	// Define os dados do servidor e tipo de conexão
-	$mail->IsSMTP(); // Define que a mensagem será SMTP
-	$mail->SMTPAuth 	= true; // Usa autenticação SMTP? (obrigatório para alguns servidores, como o gmail)
-	$mail->Port 		= $SMTP_PORTA;
-	$mail->Host 		= $SMTP_ENVIAEMAIL;
-	$mail->Username 	= $EMAIL_ENVIO_AUTOMATICO; // Usuário do servidor SMTP
-	$mail->Password 	= $SENHA_EMAIL_ENVIO_AUTOMATICO; // Senha do servidor SMTP
-	$mail->SMTPSecure 	= "ssl";
-	$mail->SetFrom($EMAIL_ENVIO_AUTOMATICO, 'Título');
-	$mail->AddAddress($email); // Define o remetente
-
-	// Configurações do corpo do e-mail
-	$mail->IsHTML(true); // Define que o e-mail será enviado como HTML
-	$mail->CharSet = 'UTF-8'; // Charset da mensagem (opcional)
-	$mail->Subject 	= $title;
-	$mail->Body 	= $body;
-
-	// echo $mail->Send() ? '1' : '0';
-	return $mail->Send() ? '1' : '0';
-}
-
 function in_comando($comando, $usuario='') { 
 	if ($usuario == '') { 
 		global $usuario_Global;
@@ -416,6 +390,55 @@ function corretor($palavra) {
 	include $preDirectory."/dicionario.php";
 
 	return $palavra;
+}
+
+/**********************************************************************************************/
+/* FUNÇÕES PARA EMAIL */
+/**********************************************************************************************/
+class Email extends PadraoObjeto { 
+	var $host;
+	var $username;
+	var $password;
+	var $isGmail;
+	var $nameFrom;
+	var $emailAddress;
+	var $nameAddress;
+	var $subject = '';
+	var $body = '';
+	var $altBody = '';
+	var $imgs = array();
+}
+
+function enviarEmail($email) { 
+	require '../vendor/autoload.php';
+	$mail = new PHPMailer();
+	try { 
+		// Define os dados do servidor e tipo de conexão
+		$mail->IsSMTP(); 												// Define que a mensagem será SMTP
+		$mail->SMTPAuth 	= true; 									// Usa autenticação SMTP? 
+																		// (obrigatório para alguns servidores, como o gmail)
+		$mail->Port 		= $email->isGmail ? 465 : 587;
+		$mail->Host 		= $email->host;
+		$mail->Username 	= $email->username; 						// Usuário do servidor SMTP
+		$mail->Password 	= $email->password; 						// Senha do servidor SMTP
+		if ($email->isGmail) $mail->SMTPSecure 	= "ssl";
+		$mail->SetFrom($email->username, $email->nameFrom);
+		$mail->AddAddress($email->emailAddress, $email->nameAddress); 	// Define o remetente
+		// Configurações do corpo do e-mail
+		$mail->IsHTML(true); 											// Define que o e-mail será enviado como HTML
+		$mail->CharSet 		= 'UTF-8'; 									// Charset da mensagem (opcional)
+		$mail->Subject 		= $email->subject;
+		$mail->Body 		= $email->body;
+
+		foreach ($email->imgs as $img) { 
+			foreach ($img as $key => $value) { 
+				$mail->AddEmbeddedImage($value, $key);
+			}
+		}
+		return $mail->Send() ? '1' : '0';
+	} catch (Exception $e) { 
+		return '0';
+	}
 }
 
 /**********************************************************************************************/

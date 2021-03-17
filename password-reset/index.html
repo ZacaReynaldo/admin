@@ -8,6 +8,7 @@
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 	<link rel="stylesheet" href="../biblioteca/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../biblioteca/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/toast/jquery.toast.min.css">
 	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
 	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="../biblioteca/plugins/iCheck/square/blue.css">
@@ -37,10 +38,13 @@
 				<div class="form-group has-feedback">
 					<input type="email" class="form-control" id="email" name="email" required autofocus>
 				</div>
+				<div id="obsEnvioEmail"></div>
 				<div class="row">
-					<div class="col-xs-8 linkAdicionais"></div>
-					<div class="col-xs-4">
-						<button type="submit" class="btn btn-primary btn-block btn-flat">Enviar</button>
+					<div class="col-xs-7 linkAdicionais"></div>
+					<div class="col-xs-5">
+						<button type="submit" id="btnEnviar" class="btn btn-primary btn-block btn-flat">
+							<i class="fa fa-send"></i>&nbsp;&nbsp;&nbsp;Enviar
+						</button>
 					</div>
 				</div>
 			</form>
@@ -48,7 +52,10 @@
 	</div>
 	<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="../biblioteca/bower_components/jquery-mask/jquery.mask.min.js"></script>
+	<script src="../biblioteca/bower_components/toast/jquery.toast.min.js"></script>
 	<script src="../biblioteca/plugins/iCheck/icheck.min.js"></script>
+	<script src="../js/resolvConfig.full.js"></script>
 	<script>
 		$(function() { 
 			$('input').iCheck({
@@ -58,6 +65,7 @@
 			});
 		});
 
+		var loaderBg_Global;
 		$(document).ready(function() { 
 			$.ajax({
 				url: '../controller/login.php'
@@ -93,35 +101,60 @@
 						+ '<div><a href="../create-user">' + data.linkCadastro + '</a></div>'
 					);
 				}
+				loaderBg_Global	= data.colorLoadAlert || '#11ACED';
 			});
 		});
 
 		$("#formEmalPasswordReset").submit(function(e) { 
 			e.preventDefault();
-			$.ajax({
+
+			$("#btnEnviar").attr('disabled',true).find('i').attr('class','fa fa-spinner fa-pulse');
+
+			$.ajax({ 
 				  url: '../controller/login.php'
 				, type: 'POST'
 				, dataType: 'text'
 				, data: { 'passwordReset': true, 'email': $("#email").val() }
 				, error: function() { 
 					alert('Falha ao fazer a requisição!');
+					$("#btnEnviar").attr('disabled',false).find('i').attr('class','fa fa-send');
 				}
 			}).done(function(data) { 
 				console.log(data);
 				data = JSON.parse(data);
 				console.log(data);
 
-				if (data[0].debug == 'OK') { 
-					data[0].debug = undefined;
-					localStorage.setItem('usuario',JSON.stringify(data[0]));
-					window.location.assign('../principal');
+				$("#btnEnviar").attr('disabled',false).find('i').attr('class','fa fa-send');
+
+				if (data == '1') { 
+					$("#obsEnvioEmail").html(''
+						+ 'E-mail enviado com sucesso!<br>'
+						+ 'Alguns e-mails podem ir para Caixa de Spam, verifique-a, caso não apareça na sua Caixa de Entrada'
+					);
 				} else { 
-					alert('Login inválido!');
-					$("#login").val('')[0].focus();
-					$("#senha").val('');
+					alert('Falha ao enviar email: ' + data);
 				}
 			});
 		});
+
+		var alertOld = alert;
+		setTimeout(function() { 
+			alert = function(text, options={}) { 
+				try { 
+					$.toast({ 
+						heading: options.head || $(".titulo_pagina").html() || 'Aviso',
+						text,
+						showHideTransition: options.animation || 'slide',
+						icon: options.icon || 'warning',
+						position: options.position || "top-right",
+						loaderBg: options.loaderBg || loaderBg_Global
+					});
+				} catch(e) { 
+					console.error(e);
+					alertOld(text);
+				}
+			}
+		}, 500);
 	</script>
 </body>
 </html>

@@ -67,9 +67,7 @@
 				, type: 'POST'
 				, dataType: 'text'
 				, data: { 'getConfigCadastro': true }
-				, error: function() { 
-					alert('Falha ao fazer a requisição!');
-				}
+				, error: function() { alert('Falha ao fazer a requisição!'); }
 			}).done(function(data) { 
 				console.log(data);
 				data = JSON.parse(data);
@@ -151,26 +149,22 @@
 			$("#formCadastroRender").html(
 				resolvConfig([ { row } 
 					, { row: [ 
-						{ div: { ctx: [ 
-							{ button: { 
-								desc: 'Voltar', classDiv: 'col-xs-6', class: 'btn btn-default btn-block'
-								, style: { 
-									'display': cadastroAtual_Global == 0 ? 'none' : 'block'
-								}
+						{ div: { id: 'btnsFormRender', ctx: [ 
+							{ button: { desc: 'Voltar', classDiv: 'col-xs-6', class: 'btn btn-default btn-block'
+								, style: { 'display': cadastroAtual_Global == 0 ? 'none' : 'block' }
 								, styleDiv: { 'margin-top':'10px','padding-left':'0' }
 								, click: function() { 
 									cadastroAtual_Global--;
 									resolvFormCadastro();
 								}
 							} },
-							{ button: { 
-								desc: cadastroAtual_Global == form_Global.length-1 ? 'Finalizar' : 'Prosseguir'
+							{ button: { desc: cadastroAtual_Global == form_Global.length-1 ? 'Finalizar' : 'Prosseguir'
 								, classDiv: 'col-xs-6', class: 'btn btn-block btn-primary'
 								, styleDiv: { 'margin-top':'10px','padding-right':'0' }
 								, click: function() { 
 									var form = getForm(form_Global[cadastroAtual_Global]);
 									if (!form.valid) return;
-	
+
 									$.ajax({ 
 										url: '../controller/login.php',
 										type: 'POST',
@@ -182,7 +176,6 @@
 										error: function() { alert('Falha ao tentar validar o formulario!'); }
 									}).done(function(data) { 
 										console.log(data);
-	
 										if (data != '') { 
 											try { 
 												data = JSON.parse(data);
@@ -222,7 +215,7 @@
 			if (!getFormObj.valid) valid = getFormObj.valid;
 			param = getFormObj.param;
 
-			$("#formCadastroRender").find('button').attr('disabled',true);
+			$("#btnsFormRender").find('button').attr('disabled',true);
 
 			param.enviarFormulario = true;
 			console.log(param);
@@ -234,11 +227,13 @@
 				, type: 'POST'
 				, dataType: 'text'
 				, data: param
-				, error: function() {
+				, error: function() { 
 					alert('Falha ao enviar formulario!');
+					$("#btnsFormRender").find('button').attr('disabled',false);
 				}
 			}).done(function(data) { 
 				console.log(data);
+				$("#btnsFormRender").find('button').attr('disabled',false);
 
 				if (data != '1') { 
 					try { 
@@ -269,7 +264,7 @@
 						loaderBg: options.loaderBg || loaderBg_Global
 					});
 				} catch(e) { 
-					// console.error(e);
+					console.error(e);
 					alertOld(text);
 				}
 			}

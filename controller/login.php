@@ -6,10 +6,6 @@ date_default_timezone_set('America/Sao_Paulo');
 // Import PHPMailer classes into the global namespace
 // These must be at the top of your script, not inside a function
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
 // Load Composer's autoloader
 require '../vendor/autoload.php';
 
@@ -90,7 +86,7 @@ if (!empty($_POST['getConfigForgetPassword'])) {
 	echo json_encode($config->forget_password);
 }
 
-if (!empty($_POST['login']) && !empty($_POST['senha'])) { 
+if (!empty($_POST['loginSystem']) && !empty($_POST['login']) && !empty($_POST['senha'])) { 
 	// $login = strtoupper(preg_replace('/[^[:alpha:]_]/', '', $_POST['login']));
 	// $senha = preg_replace('/[^[:alnum:]_]/', '', $_POST['senha']);
 	// $login = preg_replace("/[a-zA-Z0-9_-.+]+@[a-zA-Z0-9-]+.[a-zA-Z]+/", '', $_POST['login']);
@@ -123,10 +119,11 @@ if (!empty($_POST['login']) && !empty($_POST['senha'])) {
 if (!empty($_POST['passwordReset'])) { 
 	$email = $_POST['email'];
 
-	$sql = "SELECT 	NOME
+	$sql = "SELECT 	USUARIO.D_USUARIO
+			, 		USUARIO.OME
 			FROM 	USUARIO
-			WHERE 	EMAIL 		= '$email'
-			AND 	CK_INATIVO 	= 0";
+			WHERE 	USUARIO.EMAIL 		= '$email'
+			AND 	USUARIO.CK_INATIVO 	= 0";
 	// printQuery($sql);
 	$usuario = padraoResultado($pdo, $sql, 'E-mail inválido!');
 	$usuario = $usuario[0];
@@ -138,80 +135,90 @@ if (!empty($_POST['passwordReset'])) {
 
 	$configEnv = json_decode(file_get_contents('../config.env'));
 	// Instantiation and passing `true` enables exceptions
-	$mail = new PHPMailer(true);
 
-	try { 
-		// Server settings
-		// $mail->SMTPDebug 	= SMTP::DEBUG_SERVER; 						// Enable verbose debug output
-		$mail->isSMTP();
-		// $mail->SMTPDebug  	= 1; 										// Send using SMTP
-		$mail->CharSet 			= 'UTF-8';
-		$mail->Host 			= $configEnv->password_reset__host; 		// Set the SMTP server to send through
-		$mail->SMTPAuth 		= true; 									// Enable SMTP authentication
-		$mail->Username 		= $configEnv->password_reset__email; 		// SMTP username
-		$mail->Password 		= $configEnv->password_reset__psw; 			// SMTP password
+	$id_usuario = $usuario->get('ID_USUARIO');
+	$hashPasswordReset = hash('md5', $usuario->get('ID_USUARIO') . date('YmdHis'));
 
-		if ($configEnv->password_reset__isGmail) { 
-			// $mail->SMTPSecure 	= PHPMailer::ENCRYPTION_SMTPS; 		// Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-			$mail->SMTPSecure 	= 'ssl';
-			$mail->Port 		= 465;
-			// SSL port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
-		} else { 
-			// $mail->SMTPSecure 	= PHPMailer::ENCRYPTION_STARTTLS; 		// Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
-			$mail->Port 		= 587;
-			// TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
-		}
+	$sql = "INSERT INTO SENHA_RESET (HASH, ID_USUARIO) VALUES ('$hashPasswordReset', $id_usuario);";
+	// printQuery($sql);
+	padraoExecute($pdo, $sql);
 
-		// Recipients
-		$mail->setFrom($configEnv->password_reset__email, $configEnv->password_reset__name);
-		$mail->addAddress($email, $usuario->get('NOME')); 				// Add a recipient
-		// $mail->addAddress('ellen@example.com'); 						// Name is optional
-		// $mail->addReplyTo('info@example.com', 'Information');
-		// $mail->addCC('cc@example.com');
-		// $mail->addBCC('bcc@example.com');
+	// $_SERVER["HTTP_HOST"]; 				// "localhost" 
+	// $_SERVER["REQUEST_SCHEME"]; 			// "http" 
+	// $_SERVER["SCRIPT_FILENAME"]; 		// "E:/servidor/admin/controller/login.php" 
+	// $_SERVER["DOCUMENT_ROOT"]; 			// "E:/servidor" 
+	$link = $_SERVER["SCRIPT_FILENAME"]; 	// "E:/servidor/admin/controller/login.php" 
+	$link = explode('/', $link);
+	array_splice($link, sizeof($link)-2, 2);
+	$link = implode('/', $link);
+	// $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"] . ':' . $_SERVER["SERVER_PORT"], 
+	$link = str_replace(
+		$_SERVER["DOCUMENT_ROOT"], 
+		$_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"], 
+		$link
+	);
+	$link .= '/password-change/?key=' . $hashPasswordReset;
 
-		// Attachments
-		// $mail->addAttachment('/var/tmp/file.tar.gz'); 				// Add attachments
-		// $mail->addAttachment('/tmp/image.jpg', 'new.jpg'); 			// Optional name
+	$body = require './template/password-reset.php';
+	$body = str_replace('NOME_EMPRESA'				, $configEnv->password_reset__name			, $body);
+	$body = str_replace('ENDERECO_EMPRESA'			, $configEnv->password_reset__endereco		, $body);
+	$body = str_replace('SITE_EMPRESA'				, $configEnv->password_reset__site			, $body);
+	$body = str_replace('EMAIL_CONTATO_EMPRESA'		, $configEnv->password_reset__emailContato	, $body);
+	$body = str_replace('NOME_USUARIO'				, $usuario->get('NOME')						, $body);
+	$body = str_replace('EMAIL_USUARIO'				, $email									, $body);
+	$body = str_replace('LINK_REDEFINIR_SENHA'		, $link										, $body);
 
+	$mail = new Email();
+	$mail->host 		= $configEnv->password_reset__host;
+	$mail->username 	= $configEnv->password_reset__email;
+	$mail->password 	= $configEnv->password_reset__psw;
+	$mail->isGmail 		= $configEnv->password_reset__isGmail;
+	$mail->nameFrom 	= $configEnv->password_reset__name;
+	$mail->emailAddress = $email;
+	$mail->nameAddress 	= $usuario->get('NOME');
+	$mail->subject 		= 'Confirmar alteração de senha do perfil ' . $usuario->get('NOME');
+	$mail->body 		= $body;
+	$mail->push(array( 'logo_ref' => '../img/logo.png' ), 'imgs');
 
-		// $_SERVER["HTTP_HOST"]; 			// "localhost" 
-		// $_SERVER["REQUEST_SCHEME"]; 		// "http" 
-		// $_SERVER["SCRIPT_FILENAME"]; 	// "E:/servidor/admin/controller/login.php" 
-		// $_SERVER["DOCUMENT_ROOT"]; 		// "E:/servidor" 
-		$link = $_SERVER["SCRIPT_FILENAME"]; // "E:/servidor/admin/controller/login.php" 
-		$link = explode('/', $link);
-		array_splice($link, sizeof($link)-2, 2);
-		$link = implode('/', $link);
-		// $_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"] . ':' . $_SERVER["SERVER_PORT"], 
-		$link = str_replace(
-			$_SERVER["DOCUMENT_ROOT"], 
-			$_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER["HTTP_HOST"], 
-			$link
-		);
-		$link .= '/password-reset';
+	echo enviarEmail($mail);
+}
 
-		$body = require './template/password-reset.php';
-		$body = str_replace('NOME_EMPRESA'				, $configEnv->password_reset__name			, $body);
-		$body = str_replace('ENDERECO_EMPRESA'			, $configEnv->password_reset__endereco		, $body);
-		$body = str_replace('SITE_EMPRESA'				, $configEnv->password_reset__site			, $body);
-		$body = str_replace('EMAIL_CONTATO_EMPRESA'		, $configEnv->password_reset__emailContato	, $body);
-		$body = str_replace('NOME_USUARIO'				, $usuario->get('NOME')						, $body);
-		$body = str_replace('EMAIL_USUARIO'				, $email									, $body);
-		$body = str_replace('LINK_REDEFINIR_SENHA'		, $link										, $body);
-
-		// Content
-		$mail->isHTML(true); 											// Set email format to HTML
-		$mail->Subject 	= 'Confirmar alteração de senha do perfil ' . $usuario->get('NOME');
-		$mail->Body 	= $body; 				// Is HTML
-		$mail->AltBody 	= ''; 											// Text Plain
-		$mail->AddEmbeddedImage('../img/logo.png', 'logo_ref');
-
-		$mail->send();
-		echo '1';
-	} catch (Exception $e) { 
-		echo "Falha ao enviar mensagem. Error: {$mail->ErrorInfo}";
+if (!empty($_POST['passwordChange'])) { 
+	if (empty($_POST['key']) || empty($_POST['senha'])) { 
+		echo toJson(array(new FalseDebug('Informe os dados corretamente!')));
+		return;
 	}
+	$key = $_POST['key'];
+	$senha = $_POST['senha'];
+	$senha = hash('sha224', $senha);
+
+	$sql = "SELECT SENHA_RESET.ID_USUARIO
+			FROM SENHA_RESET
+			WHERE SENHA_RESET.HASH = '$key'
+			AND SENHA_RESET.CK_INATIVO = 0";
+	// printQuery($sql);
+	$resultado = padraoResultado($pdo, $sql, 'Nenhum resultado encontrado!');
+	$resultado = $resultado[0];
+	if ($resultado->get('debug') != 'OK') { 
+		echo toJson(array(new FalseDebug('Chave inválida!')));
+		return;
+	}
+
+	$id_usuario = $resultado->get('ID_USUARIO');
+
+	$sql = "UPDATE 	USUARIO
+			SET 	USUARIO.SENHA = '$senha'
+			WHERE 	USUARIO.ID_USUARIO = $id_usuario";
+	// printQuery($sql);
+	padraoExecute($pdo, $sql, '');
+
+	$sql = "UPDATE 	SENHA_RESET
+			SET 	SENHA_RESET.CK_INATIVO = 1
+			WHERE 	SENHA_RESET.HASH = '$key'";
+	// printQuery($sql);
+	padraoExecute($pdo, $sql, '');
+
+	echo toJson(array(new FalseDebug('OK')));
 }
 
 if (!empty($_POST['buscarCep'])) { 

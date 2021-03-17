@@ -1,3 +1,25 @@
+<?php
+
+include '../controller/funcoes.php';
+$pdo = getConection();
+
+$key = '';
+
+if (isset($_GET['key'])) $key = $_GET['key'];
+
+$sql = "SELECT 
+			USUARIO.ID_USUARIO,
+			USUARIO.NOME
+		FROM SENHA_RESET
+		INNER JOIN USUARIO ON USUARIO.ID_USUARIO = SENHA_RESET.ID_USUARIO
+		WHERE SENHA_RESET.HASH = '$key'
+		AND TIME_TO_SEC(TIMEDIFF(CURRENT_TIMESTAMP, SENHA_RESET.DT_SENHA_RESET)) <= 18000 -- 5 horas
+		AND SENHA_RESET.CK_INATIVO = 0";
+// printQuery($sql);
+$resultado = padraoResultado($pdo, $sql, 'Nenhum resultado encontrado!');
+$resultado = $resultado[0];
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,8 +30,8 @@
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 	<link rel="stylesheet" href="../biblioteca/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../biblioteca/bower_components/font-awesome/css/font-awesome.min.css">
-	<link rel="stylesheet" href="../biblioteca/bower_components/toast/jquery.toast.min.css">
 	<link rel="stylesheet" href="../biblioteca/bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="../biblioteca/bower_components/toast/jquery.toast.min.css">
 	<link rel="stylesheet" href="../biblioteca/dist/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="../biblioteca/plugins/iCheck/square/blue.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
@@ -29,27 +51,92 @@
 			</div>
 			<a href="#" class="titulo_projeto_login"></a>
 		</div>
+		<div class="text-center">
+			<h3 class="tituloPagina"></h3>
+		</div>
 		<div class="login-box-body">
-			<form id='formLogin' action="controller/login.php" method="post">
-				<span id="login_desc">Usuário</span>:
-				<div class="form-group has-feedback">
-					<input type="text" class="form-control" id="login" name="login" required autofocus>
-				</div>
-				Senha:
-				<div class="form-group has-feedback">
-					<input type="password" class="form-control" id="senha" name="senha">
-				</div>
+
+<?php 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+if ($resultado->get('debug') == 'OK') { 
+	echo "
+			<script>var key = '$key';</script>";
+?>
+			<script src="./form.js"></script>
+			<div class="text-center">
+				<p>Escolha uma nova senha para seu perfil <b><?php echo $resultado->get('NOME'); ?></b></p>
+			</div>
+			<div>
+				<div class="row" id="formEmalPasswordChange"></div>
+				<br>
 				<div class="row">
-					<div class="col-xs-8 linkAdicionais"></div>
-					<div class="col-xs-4">
-						<button type="submit" id="btnLogin" class="btn btn-primary btn-block btn-flat">
-							<i class="fa fa-sign-in"></i>&nbsp;&nbsp;&nbsp;Entrar
+					<div class="col-xs-7 linkAdicionais"></div>
+					<div class="col-xs-5">
+						<button onclick="passwordChange();" id="btnEnviar" class="btn btn-primary btn-block btn-flat">
+							<i class="fa fa-check"></i>&nbsp;&nbsp;&nbsp;Redefinir
 						</button>
 					</div>
 				</div>
-			</form>
+			</div>
+			<script>
+				function resolvForm() { 
+					$("#formEmalPasswordChange").html(resolvConfig(form_Global, 0, true));
+				}
+
+				function passwordChange() { 
+					var form = getForm(form_Global);
+					if (!form.valid) return;
+
+					form.param.passwordChange = true;
+					form.param.key = key;
+
+					$("#btnEnviar").attr('disabled',true).find('i').attr('class','fa fa-spinner fa-pulse');
+
+					$.ajax({ 
+						url: '../controller/login.php'
+						, type: 'POST'
+						, dataType: 'text'
+						, data: form.param
+						, error: function() { 
+							alert('Falha ao fazer a requisição!');
+							$("#btnEnviar").attr('disabled',false).find('i').attr('class','fa fa-check');
+						}
+					}).done(function(data) { 
+						console.log(data);
+						data = JSON.parse(data);
+						console.log(data);
+
+						$("#btnEnviar").attr('disabled',false).find('i').attr('class','fa fa-check');
+
+						if (data[0].debug == 'OK') { 
+							alert('Senha alterado com sucesso!', { icon: 'success' });
+							setTimeout(function() { 
+								window.location.assign('../login');
+							}, 2500);
+						} else { 
+							alert('Falha ao redefinir senha: ' + data[0].debug);
+							try { $("#senha")[0].focus(); } catch(e) { }
+						}
+					});
+				}
+			</script>
+<?php
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+} else { 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+?>
+			<div class="text-center">
+				<h2>Link Expirado</h2>
+			</div>
+<?php
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+?>
+
+
 		</div>
 	</div>
+
 	<script src="../biblioteca/bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="../biblioteca/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="../biblioteca/plugins/iCheck/icheck.min.js"></script>
@@ -71,7 +158,7 @@
 				url: '../controller/login.php'
 				, type: 'POST'
 				, dataType: 'text'
-				, data: { 'getConfigLogin': true }
+				, data: { 'getConfigForgetPassword': true }
 				, error: function() { 
 					alert('Falha ao fazer a requisição!');
 				}
@@ -80,70 +167,30 @@
 				data = JSON.parse(data);
 				console.log(data);
 
-				if ((data.no_set_nome || '') == '') { 
+				if ((data.no_set_nome || '') == '') {
 					$(".titulo_projeto_login").html((data.nome_projeto || ''));
 				}
 				$(".titulo_projeto").html((data.nome_projeto || ''));
 
-				$("#login").attr('type', (data.login_type || 'text'));
-				if ((data.login_maxlength || '') != '') $("#login").attr('maxlength', data.login_maxlength);
-				$("#login_desc").html((data.login_desc || 'Login'));
-				
+				if ((data.email_maxlength || '') != '') $("#email").attr('maxlength', data.email_maxlength);
+
 				if ((data.logo_png || '') != '') { 
 					$("#logoOficial").attr('src','../img/' + data.logo_png + '.png').css('display','block');
 				} else { 
 					$("#logoOficial").css('display','none');
 				}
 
+				$(".tituloPagina").html(data.linkPasswordChange || "Redefinir Senha");
+				$(".linkAdicionais").append('<div><a href="../login">' + data.linkLogin + '</a></div>');
+
 				if ((data.isCadastro || '') != '') { 
 					$(".linkAdicionais").append(''
 						+ '<div><a href="../create-user">' + data.linkCadastro + '</a></div>'
 					);
 				}
-
-				if ((data.isForgetPassword || '') != '') { 
-					$(".linkAdicionais").append(''
-						+ '<div><a href="../password-reset">' + data.linkForgetPassword + '</a></div>'
-					);
-				}
 				loaderBg_Global	= data.colorLoadAlert || '#11ACED';
-			});
-		});
 
-		$("#formLogin").submit(function(e) { 
-			e.preventDefault();
-
-			$("#btnLogin").attr('disabled',true).find('i').attr('class','fa fa-spinner fa-pulse');
-
-			$.ajax({
-				  url: '../controller/login.php'
-				, type: 'POST'
-				, dataType: 'text'
-				, data: { 
-					  'loginSystem': true
-					, 'login': $("#login").val()
-					, 'senha': $("#senha").val()
-				}
-				, error: function() { 
-					alert('Falha ao fazer a requisição!');
-					$("#btnLogin").attr('disabled',false).find('i').attr('class','fa fa-sign-in');
-				}
-			}).done(function(data) { 
-				console.log(data);
-				data = JSON.parse(data);
-				console.log(data);
-
-				$("#btnLogin").attr('disabled',false).find('i').attr('class','fa fa-sign-in');
-
-				if (data[0].debug == 'OK') { 
-					data[0].debug = undefined;
-					localStorage.setItem('usuario',JSON.stringify(data[0]));
-					window.location.assign('../principal');
-				} else { 
-					alert('Login inválido!');
-					$("#login").val('')[0].focus();
-					$("#senha").val('');
-				}
+				try { resolvForm(); } catch(e) { }
 			});
 		});
 
