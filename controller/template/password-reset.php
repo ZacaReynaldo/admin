@@ -6,7 +6,7 @@ return '<center>
 		<div style="margin:0px auto;max-width:600px">
 			<div style="margin:0px auto;max-width:300px">
 				<img alt="NOME_EMPRESA" height="auto"
-					src="cid:logo_ref"
+					src="LINK_LOGOTIPO"
 					style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px"
 					width="130">
 			</div>

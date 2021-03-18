@@ -487,6 +487,38 @@ function getRndInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
+function confirmModal(options) { 
+	/*
+		options: {
+			msm: '' 				-- Mensagem a ser mostrada na tela
+			done: function() {} 	-- Função disparada quando confirmar
+			btnDesc: 'Confirmar' 	-- Descrição do botão de confirmação
+			btnIcon: 'check' 		-- Icone do botão de confirmação
+			btnClass: 'success' 	-- Class do botão de confirmação
+		}
+	*/
+	var { done } = options;
+	eval(''
+		+ 	'done = function() { '
+		+ 		'closeModal();'
+		+ 		'var func = ' + String(done || function() {})
+		+ 		';func();'
+		+ 	'}'
+	);
+
+	openModal({
+		head: options.msm,
+		foot: resolvConfig({
+			button: { 
+				  desc: 	(options.btnDesc 	|| 'Confirmar')
+				, icon: 	(options.btnIcon 	|| 'check')
+				, class: 	'btn btn-' + (options.btnClass || 'success')
+				, click: 	done
+			}
+		})
+	});
+}
+
 function openModal(options) { 
 	/*
 		options: {
@@ -501,7 +533,8 @@ function openModal(options) {
 	onCloseModal = (options.onClose || function() { });
 
 	$("#modalHeadGenerico").html((options.head || ''));
-	$("#modalBodyGenerico").html((options.body || ''));
+	$("#modalBodyGenerico").html((options.body || ''))
+		.css('display',((options.body || '') == '' ? 'none' : 'block'));
 	$("#modalFootGenerico").html((options.foot || ''));
 
 	if ($('#modalGenerico').is(':visible')) { 
@@ -572,6 +605,7 @@ function orderArray(array, param='', paramSecond='') {
 	return array;
 }
 
+var loaderBg_Global = '#11ACED';
 var alertOld = alert;
 setTimeout(function() { 
 	alert = function(text, options={}) { 
@@ -582,7 +616,7 @@ setTimeout(function() {
 				showHideTransition: options.animation || 'slide',
 				icon: options.icon || 'warning',
 				position: options.position || "bottom-right",
-				loaderBg: options.loaderBg || '#11ACED'
+				loaderBg: options.loaderBg || loaderBg_Global
 			});
 		} catch(e) { 
 			// console.error(e);
@@ -760,6 +794,8 @@ function initComponet() {
 
 			if ((data['color-nome_usuario'] || '') != '')
 				$(".nome_usuario").css('color', data['color-nome_usuario'])
+
+			loaderBg_Global = data['colorLoadAlert'] || '#11ACED';
 		}
 	}
 

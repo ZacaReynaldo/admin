@@ -406,6 +406,7 @@ class Email extends PadraoObjeto {
 	var $subject = '';
 	var $body = '';
 	var $altBody = '';
+	var $debug = false;
 	var $imgs = array();
 }
 
@@ -414,6 +415,7 @@ function enviarEmail($email) {
 	$mail = new PHPMailer();
 	try { 
 		// Define os dados do servidor e tipo de conexão
+		if ($email->debug) $mail->SMTPDebug = 1; 						// Habilita o debug na hora de enviar o email
 		$mail->IsSMTP(); 												// Define que a mensagem será SMTP
 		$mail->SMTPAuth 	= true; 									// Usa autenticação SMTP? 
 																		// (obrigatório para alguns servidores, como o gmail)

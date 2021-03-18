@@ -44,6 +44,7 @@ if (!empty($_POST['updateUser'])) {
 
 if (!empty($_POST['getConfigPrincipal'])) { 
 	$config->principal->nome_projeto = $config->nome_projeto;
+	if (isset($config->colorLoadAlert)) $config->principal->colorLoadAlert = $config->colorLoadAlert;
 	echo json_encode($config->principal);
 }
 

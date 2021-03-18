@@ -92,6 +92,7 @@ if (!empty($_POST['loginSystem']) && !empty($_POST['login']) && !empty($_POST['s
 	// $login = preg_replace("/[a-zA-Z0-9_-.+]+@[a-zA-Z0-9-]+.[a-zA-Z]+/", '', $_POST['login']);
 	$login = preg_replace("/[^[a-zA-Z0-9-.+@]_]+/", '', $_POST['login']);
 	$senha = preg_replace('/[^[:alnum:]_]/', '', $_POST['senha']);
+
 	$senha = hash('sha224', $senha);
 	$hashIdtentificacao = hash('sha224', date('YmdHis'));
 
@@ -100,12 +101,12 @@ if (!empty($_POST['loginSystem']) && !empty($_POST['login']) && !empty($_POST['s
 				, USUARIO.NOME AS NOME
 				, '$hashIdtentificacao' AS HASH
 			FROM USUARIO
-			WHERE USUARIO.EMAIL = '$login'
-			AND USUARIO.SENHA = '$senha'";
+			WHERE 	USUARIO.EMAIL 		= '$login'
+			AND 	USUARIO.SENHA 		= '$senha'
+			AND 	USUARIO.CK_INATIVO 	= 0";
 	// printQuery(getQuery($pdo, $sql));
 	// printQuery($sql);
 	$usuario = padraoResultado($pdo, $sql, 'Nenhum resultado encontrado!');
-
 	$usuario = $usuario[0];
 	if ($usuario->get('debug') == 'OK') { 
 		$id_usuario = $usuario->get('ID_USUARIO');
@@ -164,6 +165,7 @@ if (!empty($_POST['passwordReset'])) {
 	$body = str_replace('ENDERECO_EMPRESA'			, $configEnv->password_reset__endereco		, $body);
 	$body = str_replace('SITE_EMPRESA'				, $configEnv->password_reset__site			, $body);
 	$body = str_replace('EMAIL_CONTATO_EMPRESA'		, $configEnv->password_reset__emailContato	, $body);
+	$body = str_replace('LINK_LOGOTIPO'				, $configEnv->password_reset__linkLogotipo	, $body);
 	$body = str_replace('NOME_USUARIO'				, $usuario->get('NOME')						, $body);
 	$body = str_replace('EMAIL_USUARIO'				, $email									, $body);
 	$body = str_replace('LINK_REDEFINIR_SENHA'		, $link										, $body);
@@ -178,7 +180,7 @@ if (!empty($_POST['passwordReset'])) {
 	$mail->nameAddress 	= $usuario->get('NOME');
 	$mail->subject 		= 'Confirmar alteração de senha do perfil ' . $usuario->get('NOME');
 	$mail->body 		= $body;
-	$mail->push(array( 'logo_ref' => '../img/logo.png' ), 'imgs');
+	// $mail->push(array( 'logo_ref' => '../img/logo.png' ), 'imgs');
 
 	echo enviarEmail($mail);
 }
