@@ -495,12 +495,13 @@ function confirmModal(options) {
 			btnDesc: 'Confirmar' 	-- Descrição do botão de confirmação
 			btnIcon: 'check' 		-- Icone do botão de confirmação
 			btnClass: 'success' 	-- Class do botão de confirmação
+			manualClose: (0|1) 		-- Fechar modal manualmente
 		}
 	*/
 	var { done } = options;
 	eval(''
 		+ 	'done = function() { '
-		+ 		'closeModal();'
+		+ 		((options.manualClose || '') == '' ? 'closeModal();' : '')
 		+ 		'var func = ' + String(done || function() {})
 		+ 		';func();'
 		+ 	'}'
