@@ -226,7 +226,7 @@ function returnUser($pdo, $hash, $inativo='') {
 
 	$sql = "SELECT 	USUARIO.ID_USUARIO
 					, USUARIO.NOME
-					, 1 AS CK_ADMIN
+					, USUARIO.CK_ADMIN
 					-- , COALESCE((
 					-- 	SELECT GROUP_CONCAT(COMANDO.DS_COMANDO)
 					-- 	FROM USUARIO_COMANDO

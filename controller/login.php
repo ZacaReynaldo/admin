@@ -98,7 +98,7 @@ if (!empty($_POST['loginSystem']) && !empty($_POST['login']) && !empty($_POST['s
 
 	$sql = "SELECT 
 				USUARIO.ID_USUARIO
-				, USUARIO.NOME AS NOME
+				, USUARIO.NOME_CONTA AS NOME
 				, '$hashIdtentificacao' AS HASH
 			FROM USUARIO
 			WHERE 	USUARIO.EMAIL 		= '$login'
