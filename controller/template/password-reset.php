@@ -24,11 +24,24 @@ return '<center>
 				<table border="0" cellpadding="0" cellspacing="0" style="border-collapse:separate;width:100%;line-height:100%">
 					<tbody>
 						<tr>
-							<td align="center" bgcolor="#226DE6" style="border:1px solid #1b55b3;border-radius:3px;background:#226de6" valign="middle">
-								<a href="LINK_REDEFINIR_SENHA"
-									rel="noopener noreferrer"
-									style="display:inline-block;background:#226de6;color:#ffffff;font-family:Nunito Sans,Arial;font-size:16px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 196px;border-radius:3px"
-									target="_blank"
+							<td align="center" bgcolor="#226DE6" 
+								style="border:1px solid #1b55b3;border-radius:3px;background:#226de6" valign="middle"
+							>
+								<a href="LINK_REDEFINIR_SENHA" rel="noopener noreferrer" target="_blank"
+									style="
+										display:inline-block;
+										background:#226de6;
+										color:#ffffff;
+										font-family:Nunito Sans,Arial;
+										font-size:16px;
+										font-weight:normal;
+										line-height:120%;
+										margin:0;
+										text-decoration:none;
+										text-transform:none;
+										padding:10px 196px;
+										border-radius:3px
+									"
 								>
 									Confirmar alteração
 								</a>
